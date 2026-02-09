@@ -4,8 +4,8 @@ from enemy import Enemy
 
 pygame.init()
 
-GRID_WIDTH = 5
-GRID_HEIGHT = 5
+GRID_WIDTH = 11
+GRID_HEIGHT = 11
 TILE_SIZE = 64
 SCREEN_WIDTH = GRID_WIDTH * TILE_SIZE
 SCREEN_HEIGHT = GRID_HEIGHT * TILE_SIZE
@@ -21,13 +21,14 @@ path = [(0 * TILE_SIZE + TILE_SIZE // 2, 0 * TILE_SIZE + TILE_SIZE // 2)]
 #hold tower position and data
 tower_list = []
 
-grid = [
-    [0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0],
-    [0, 0, 1, 0, 0],
-    [0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0]
-]
+grid = []
+#make grid scale to consts
+for row in range(GRID_HEIGHT):
+    layer = []
+    for col in range(GRID_WIDTH):
+        layer.append(0)
+    grid.append(layer)
+
 
 new_enemy = Enemy(0, 0, TILE_SIZE / 2, path, 100, 2, 100, 100, 0)
 
