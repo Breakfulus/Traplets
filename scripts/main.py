@@ -1,5 +1,6 @@
 import pygame
 from tower import Tower
+from enemy import Enemy
 
 pygame.init()
 
@@ -11,6 +12,15 @@ SCREEN_HEIGHT = GRID_HEIGHT * TILE_SIZE
 GRAY = (15, 15, 15)
 MODE = 0
 
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SCALED | pygame.RESIZABLE)
+pygame.display.set_caption("Traplet Tower Defense")
+
+clock = pygame.time.Clock()
+
+path = [(0 * TILE_SIZE + TILE_SIZE // 2, 0 * TILE_SIZE + TILE_SIZE // 2)]
+#hold tower position and data
+tower_list = []
+
 grid = [
     [0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0],
@@ -18,6 +28,8 @@ grid = [
     [0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0]
 ]
+
+new_enemy = Enemy(0, 0, TILE_SIZE / 2, path, 100, 2, 100, 100, 0)
 
 def mouse_position(): #get position of the tile mouse is hopvering over and indicate where the tower is placed
     mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -61,13 +73,7 @@ def remove_tower():
             tower_list.remove(t)
             print("Tower removed!")
 
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SCALED | pygame.RESIZABLE)
-pygame.display.set_caption("Traplet Tower Defense")
 
-clock = pygame.time.Clock()
-
-#hold tower position and data
-tower_list = []
 
 
 running = True
@@ -125,6 +131,9 @@ while running:
     #Draw towers
     for t in tower_list:
         t.draw(screen)
+    
+    new_enemy.update()
+    new_enemy.draw(screen)
     
     pygame.display.flip()
     clock.tick(60)
