@@ -20,6 +20,7 @@ clock = pygame.time.Clock()
 path = [(0 * TILE_SIZE + TILE_SIZE // 2, 0 * TILE_SIZE + TILE_SIZE // 2)]
 #hold tower position and data
 tower_list = []
+enemy_list = []
 
 grid = []
 #make grid scale to consts
@@ -32,6 +33,7 @@ for row in range(GRID_HEIGHT):
 preview_tiles = set()
 
 new_enemy = Enemy(0, 0, TILE_SIZE / 2, path, 100, 2, 100, 100, 0)
+enemy_list.append(new_enemy)
 
 def mouse_position(): #get position of the tile mouse is hopvering over and indicate where the tower is placed
     mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -54,7 +56,9 @@ def place_tower(pos):
             can_place = False
             print("Can't place here!")
             break
-
+    for e in enemy_list:
+        if e.rect.colliderect(new_tower):
+            can_place = False
     #only place if tile is empty
     if can_place == True:
         tower_list.append(new_tower)
@@ -96,26 +100,27 @@ while running:
             if event.key == pygame.K_c:
                 if MODE == 0: MODE = 1
                 else: MODE = 0
-            
-            if event.key == pygame.K_RETURN and preview_tiles:
-                for tile in preview_tiles:
-                    if grid[tile[1]][tile[0]] == 0:
-                        place_tower((tile[0] * TILE_SIZE + TILE_SIZE // 2, tile[1] * TILE_SIZE + TILE_SIZE // 2))
-                preview_tiles.clear()
-
 
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if MODE == 0: 
+            if event.__getattribute__('button') == 1:
+                if MODE == 0: 
+                    preview_tiles.clear()
+                    dragging = True
+                else: 
+                    select_tower(mouse_pos)
+
+            elif event.__getattribute__('button') == 3:
+                #Cancel selection with right click while selecting
                 preview_tiles.clear()
-                dragging = True
-                # tile_x, tile_y = mouse_pos[0] // TILE_SIZE, mouse_pos[1] // TILE_SIZE #get the tile the mouse is over
-                # if grid[tile_y][tile_x] == 0: #if the tile is empty place a tower
-                #     place_tower(mouse_pos)
-            else: 
-                select_tower(mouse_pos)
+                dragging = False
         
         if event.type == pygame.MOUSEBUTTONUP:
+            #stop selecting, place towers in building selection, and clear selection area
             dragging = False
+            for tile in preview_tiles:
+                    if grid[tile[1]][tile[0]] == 0 and MODE == 0:
+                        place_tower((tile[0] * TILE_SIZE + TILE_SIZE // 2, tile[1] * TILE_SIZE + TILE_SIZE // 2))
+            preview_tiles.clear()
     
     #drag selecting
     if dragging and MODE == 0:
@@ -149,19 +154,29 @@ while running:
             pygame.draw.rect(screen, color, rect)
             pygame.draw.rect(screen, (20, 20, 20), rect, 1)
     
-    for tile in preview_tiles:
-        selected_tile  = pygame.Rect(tile[0] * TILE_SIZE, tile[1] * TILE_SIZE, TILE_SIZE, TILE_SIZE)
-        pygame.draw.rect(screen, (0, 200, 0), selected_tile)
-        pygame.draw.rect(screen, (20, 20, 20, 50), selected_tile, 1)
-
+    for e in enemy_list:
+        e.update()
+        e.draw(screen)
 
     #Draw towers
     for t in tower_list:
         t.draw(screen)
     
-    new_enemy.update()
-    new_enemy.draw(screen)
-    
+    #draw building selection
+    for tile in preview_tiles:
+        selected_rect = pygame.Rect(tile[0] * TILE_SIZE, tile[1] * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+        selected_tile  = pygame.Surface((TILE_SIZE, TILE_SIZE))
+        if grid[tile[1]][tile[0]] == 0:
+            color = (0, 200, 0)
+        else:
+            color = (200, 0, 0)
+        selected_tile.fill(color)
+        selected_tile.set_alpha(125)
+        screen.blit(selected_tile, selected_rect)
+        # pygame.draw.rect(screen, color, selected_tile)
+        pygame.draw.rect(screen, (20, 20, 20, 50), selected_rect, 1)
+
+
     pygame.display.flip()
     clock.tick(60)
 
