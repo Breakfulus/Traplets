@@ -33,7 +33,7 @@ class Enemy(pygame.sprite.Sprite):
         
         if dx != 0:
             self.x += self.speed if dx > 0 else -self.speed
-        if dy != 0:
+        elif dy != 0:
             self.y += self.speed if dy > 0 else -self.speed
 
 
