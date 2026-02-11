@@ -22,8 +22,8 @@ path = [
     (7 * TILE_SIZE + TILE_SIZE // 2, 7 * TILE_SIZE + TILE_SIZE // 2)
     ]
 #hold tower position and data
-tower_list = []
-enemy_list = []
+towers = pygame.sprite.Group()
+enemies = pygame.sprite.Group()
 
 grid = []
 #make grid scale to consts
@@ -36,7 +36,7 @@ for row in range(GRID_HEIGHT):
 preview_tiles = set()
 
 new_enemy = Enemy(0, 0, TILE_SIZE / 2, path, 100, 2, 100, 100, 0)
-enemy_list.append(new_enemy)
+enemies.add(new_enemy)
 
 def mouse_position(): #get position of the tile mouse is hopvering over and indicate where the tower is placed
     mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -72,26 +72,26 @@ def draw_selection():
 #Tower functions
 def place_tower(pos):
     #Create new tower
-    new_tower = Tower(pos[0], pos[1], TILE_SIZE)
+    new_tower = Tower(pos[0], pos[1], TILE_SIZE / 2)
     #Check if tile already has tower in it
     can_place = True
-    for  t in tower_list:
+    for  t in towers:
         if t.rect.colliderect(new_tower):
             can_place = False
             print("Can't place here!")
             break
-    for e in enemy_list:
+    for e in enemies:
         if e.rect.colliderect(new_tower):
             can_place = False
     #only place if tile is empty
     if can_place == True:
-        tower_list.append(new_tower)
+        towers.add(new_tower)
         grid[new_tower.y // TILE_SIZE][new_tower.x // TILE_SIZE] = 1
         print("Tower placed!")
 
 def select_tower(mouse_pos):
     #Clicking on tower selects it, clicking off tower deselects it
-    for t in tower_list:
+    for t in towers:
         if t.rect.collidepoint(mouse_pos):
             print("Tower  Clicked!")
             t.selected = not t.selected
@@ -100,7 +100,7 @@ def select_tower(mouse_pos):
 
 def remove_tower(tower):
     grid[tower.y // TILE_SIZE][tower.x // TILE_SIZE] = 0
-    tower_list.remove(tower)
+    towers.remove(tower)
     print("Tower removed!")
 
 dragging = False
@@ -117,9 +117,9 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_F11:
                 pygame.display.toggle_fullscreen()
-                
+
             if event.key == pygame.K_DELETE or event.key == pygame.K_BACKSPACE:
-                for t in tower_list:
+                for t in towers:
                     if t.selected:
                         remove_tower(t)
         
@@ -133,6 +133,8 @@ while running:
                     preview_tiles.clear()
                     dragging = True
                 else: 
+                    preview_tiles.clear()
+                    dragging = False
                     select_tower(mouse_pos)
 
             elif event.__getattribute__('button') == 3:
@@ -151,10 +153,10 @@ while running:
             for tile in preview_tiles:
                     #Build towers
                     if grid[tile[1]][tile[0]] == 0 and MODE == 0:
-                        place_tower((tile[0] * TILE_SIZE + TILE_SIZE // 2, tile[1] * TILE_SIZE + TILE_SIZE // 2))
+                        place_tower((tile[0] * TILE_SIZE, tile[1] * TILE_SIZE))
                     #Destroy towers if in select mode dragging
                     if grid[tile[1]][tile[0]] == 1 and MODE == 1:
-                        for t in tower_list:
+                        for t in towers:
                             if t.rect.collidepoint(tile[0] * TILE_SIZE + TILE_SIZE // 2, tile[1] * TILE_SIZE + TILE_SIZE // 2):
                                 remove_tower(t)
             preview_tiles.clear()
@@ -184,13 +186,14 @@ while running:
             pygame.draw.rect(screen, color, rect)
             pygame.draw.rect(screen, (20, 20, 20), rect, 1)
     
-    for e in enemy_list:
-        e.update()
-        e.draw(screen)
+    enemies.update()
+    enemies.draw(screen)
 
     #Draw towers
-    for t in tower_list:
-        t.draw(screen)
+    for t in towers:
+        t.draw_range(screen)
+    towers.update()
+    towers.draw(screen)
     
     #draw building selection
     for tile in preview_tiles:

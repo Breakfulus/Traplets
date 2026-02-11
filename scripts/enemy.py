@@ -48,5 +48,5 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.center = self.x, self.y
     
     def draw(self, surf):
-        pygame.draw.rect(surf, 'red', self.rect)
+        surf.blit(self.image, self.rect)
 
