@@ -1,6 +1,7 @@
 import pygame
 from tower import Tower
 from enemy import Enemy
+from systems.placement_system import Grid
 
 pygame.init()
 
@@ -9,10 +10,11 @@ GRID_HEIGHT = 11
 TILE_SIZE = 64
 SCREEN_WIDTH = GRID_WIDTH * TILE_SIZE
 SCREEN_HEIGHT = GRID_HEIGHT * TILE_SIZE
+UI_PANEL = 200
 GRAY = (15, 15, 15)
 MODE = 0
 
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SCALED | pygame.RESIZABLE)
+screen = pygame.display.set_mode((SCREEN_WIDTH + UI_PANEL, SCREEN_HEIGHT), pygame.SCALED | pygame.RESIZABLE)
 pygame.display.set_caption("Traplet Tower Defense")
 
 clock = pygame.time.Clock()
@@ -24,6 +26,8 @@ path = [
 #hold tower position and data
 towers = pygame.sprite.Group()
 enemies = pygame.sprite.Group()
+
+pl = Grid(GRID_HEIGHT, GRID_WIDTH, TILE_SIZE)
 
 grid = []
 #make grid scale to consts
@@ -163,28 +167,28 @@ while running:
     
     building_selection()
     #Draw section
-    screen.fill('black')
+    screen.fill('darkslateblue')
 
     #draw mouse indicator and get mouse position
     mouse_position()
 
     #Draw grid
-    for row in range(GRID_HEIGHT):
-        for col in range(GRID_WIDTH):
-            rect = pygame.Rect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE)
-            if grid[row][col] == 0:
-                if rect.collidepoint(mouse_pos[0], mouse_pos[1]):
-                    color = (0, 100, 200)
-                else:
-                    color = (80, 80, 80)
-            else:
-                if rect.collidepoint(mouse_pos[0], mouse_pos[1]):
-                    color = (200, 100, 0)
-                else:
-                    color = (50, 50, 50)
+    # for row in range(GRID_HEIGHT):
+    #     for col in range(GRID_WIDTH):
+    #         rect = pygame.Rect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+    #         if grid[row][col] == 0:
+    #             if rect.collidepoint(mouse_pos[0], mouse_pos[1]):
+    #                 color = (0, 100, 200)
+    #             else:
+    #                 color = (80, 80, 80)
+    #         else:
+    #             if rect.collidepoint(mouse_pos[0], mouse_pos[1]):
+    #                 color = (200, 100, 0)
+    #             else:
+    #                 color = (50, 50, 50)
             
-            pygame.draw.rect(screen, color, rect)
-            pygame.draw.rect(screen, (20, 20, 20), rect, 1)
+    #         pygame.draw.rect(screen, color, rect)
+    #         pygame.draw.rect(screen, (20, 20, 20), rect, 1)
     
     enemies.update()
     enemies.draw(screen)
@@ -198,20 +202,15 @@ while running:
     #draw building selection
     for tile in preview_tiles:
         draw_selection()
+    
+    pl.get_mouse_tile_pos(mouse_pos)
+    pl.draw_grid(screen)
 
     pygame.display.flip()
     clock.tick(60)
 
 pygame.quit()
 '''TODO: Make Grid
-highlight tile over mouse hover
-different highlight colors
-Make tiles toggleable between walkable and non
-make towers
-place towers on click
-build mode
-make towers selectable
-make enemies
 make enemies spawn on E
 Make buildings
 Make enemies pathfind to buildings
