@@ -27,15 +27,7 @@ path = [
 towers = pygame.sprite.Group()
 enemies = pygame.sprite.Group()
 
-pl = Grid(GRID_HEIGHT, GRID_WIDTH, TILE_SIZE)
-
-grid = []
-#make grid scale to consts
-for row in range(GRID_HEIGHT):
-    layer = []
-    for col in range(GRID_WIDTH):
-        layer.append(0)
-    grid.append(layer)
+grid = Grid(GRID_HEIGHT, GRID_WIDTH, TILE_SIZE)
 
 preview_tiles = set()
 
@@ -63,14 +55,13 @@ def building_selection():
 def draw_selection():
     selected_rect = pygame.Rect(tile[0] * TILE_SIZE, tile[1] * TILE_SIZE, TILE_SIZE, TILE_SIZE)
     selected_tile  = pygame.Surface((TILE_SIZE, TILE_SIZE))
-    if grid[tile[1]][tile[0]] == 0:
+    if grid.is_empty(tile[1],tile[0]):
         color = (0, 200, 0)
     else:
         color = (200, 0, 0)
     selected_tile.fill(color)
     selected_tile.set_alpha(125)
     screen.blit(selected_tile, selected_rect)
-    # pygame.draw.rect(screen, color, selected_tile)
     pygame.draw.rect(screen, (20, 20, 20, 50), selected_rect, 1)
             
 #Tower functions
@@ -90,7 +81,7 @@ def place_tower(pos):
     #only place if tile is empty
     if can_place == True:
         towers.add(new_tower)
-        grid[new_tower.y // TILE_SIZE][new_tower.x // TILE_SIZE] = 1
+        grid.set_tile(new_tower.y // TILE_SIZE, new_tower.x // TILE_SIZE, 1)
         print("Tower placed!")
 
 def select_tower(mouse_pos):
@@ -103,7 +94,7 @@ def select_tower(mouse_pos):
             t.selected = False
 
 def remove_tower(tower):
-    grid[tower.y // TILE_SIZE][tower.x // TILE_SIZE] = 0
+    grid.set_tile(tower.y // TILE_SIZE, tower.x // TILE_SIZE, 0)
     towers.remove(tower)
     print("Tower removed!")
 
@@ -156,10 +147,10 @@ while running:
             dragging = False
             for tile in preview_tiles:
                     #Build towers
-                    if grid[tile[1]][tile[0]] == 0 and MODE == 0:
+                    if grid.is_empty(tile[1], tile[0]) and MODE == 0:
                         place_tower((tile[0] * TILE_SIZE, tile[1] * TILE_SIZE))
                     #Destroy towers if in select mode dragging
-                    if grid[tile[1]][tile[0]] == 1 and MODE == 1:
+                    if not grid.is_empty(tile[1], tile[0]) and MODE == 1:
                         for t in towers:
                             if t.rect.collidepoint(tile[0] * TILE_SIZE + TILE_SIZE // 2, tile[1] * TILE_SIZE + TILE_SIZE // 2):
                                 remove_tower(t)
@@ -190,6 +181,9 @@ while running:
     #         pygame.draw.rect(screen, color, rect)
     #         pygame.draw.rect(screen, (20, 20, 20), rect, 1)
     
+    grid.get_mouse_tile_pos(mouse_pos)
+    grid.draw_grid(screen)
+
     enemies.update()
     enemies.draw(screen)
 
@@ -203,8 +197,7 @@ while running:
     for tile in preview_tiles:
         draw_selection()
     
-    pl.get_mouse_tile_pos(mouse_pos)
-    pl.draw_grid(screen)
+    
 
     pygame.display.flip()
     clock.tick(60)

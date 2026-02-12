@@ -21,7 +21,7 @@ class Grid:
         col = pos[0] // self.tile_size
         row = pos[1] // self.tile_size
         self.mouse_pos = (col * self.tile_size, row * self.tile_size)
-        return col, row
+        return row, col
 
     def draw_grid(self, screen):
     #Draw grid
