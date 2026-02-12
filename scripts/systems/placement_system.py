@@ -2,7 +2,7 @@ import pygame
 
 class Grid:
     def __init__(self, grid_height, grid_width, tile_size):
-        
+        self.hovered_tile = (0, 0)
         self.grid_height = grid_height
         self.grid_width = grid_width
         self.tile_size = tile_size
@@ -20,7 +20,7 @@ class Grid:
     def get_mouse_tile_pos(self, pos):
         col = pos[0] // self.tile_size
         row = pos[1] // self.tile_size
-        self.mouse_pos = (col * self.tile_size, row * self.tile_size)
+        self.hovered_tile = (col * self.tile_size, row * self.tile_size)
         return row, col
 
     def draw_grid(self, screen):
@@ -28,7 +28,7 @@ class Grid:
         for row in range(self.grid_height):
             for col in range(self.grid_width):
                 rect = pygame.Rect(col * self.tile_size, row * self.tile_size, self.tile_size, self.tile_size)
-                if rect.collidepoint(self.mouse_pos[0], self.mouse_pos[1]):
+                if rect.collidepoint(self.hovered_tile[0], self.hovered_tile[1]):
                     if self.is_empty(row, col):
                         color = (0, 100, 200)
                     else:
