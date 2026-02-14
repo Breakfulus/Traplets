@@ -2,7 +2,8 @@ import pygame
 from entities.tower import Tower
 from entities.enemy import Enemy
 from entities.grid import Grid
-from utils import consts as c
+from systems.placement_system import PlacementSystem
+import utils.consts as c
 
 pygame.init()
 
@@ -27,15 +28,9 @@ preview_tiles = set()
 new_enemy = Enemy(0, 0, c.TILE_SIZE / 2, path, 100, 2, 100, 100, 0)
 enemies.add(new_enemy)
 
-def mouse_position(): #get position of the tile mouse is hopvering over and indicate where the tower is placed
-    mouse_x, mouse_y = pygame.mouse.get_pos()
-    col = mouse_x // c.TILE_SIZE
-    row = mouse_y // c.TILE_SIZE
-    cell_x = col * c.TILE_SIZE
-    cell_y = row * c.TILE_SIZE
-    center_x = cell_x + c.TILE_SIZE // 2
-    center_y = cell_y + c.TILE_SIZE // 2
-    return center_x, center_y
+place_system = PlacementSystem(grid.grid)
+
+place_system.mouse_position()
 
 def building_selection():
     #drag selecting
@@ -95,7 +90,7 @@ dragging = False
 
 running = True
 while running:
-    mouse_pos = mouse_position()
+    mouse_pos = place_system.mouse_position()
 
     #Event loop
     for event in pygame.event.get():
@@ -154,7 +149,7 @@ while running:
     screen.fill('darkslateblue')
 
     #draw mouse indicator and get mouse position
-    mouse_position()
+    place_system.mouse_position()
     
     grid.get_mouse_tile_pos(mouse_pos)
     grid.draw_grid(screen)

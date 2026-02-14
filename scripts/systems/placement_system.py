@@ -1,5 +1,5 @@
 import pygame
-import consts as c
+import utils.consts as c
 
 class PlacementSystem:
     def __init__(self, grid):
@@ -8,7 +8,7 @@ class PlacementSystem:
         self.dragging = False
         MODE = 0
 
-    def mouse_position():
+    def mouse_position(self):
         mouse_x, mouse_y = pygame.mouse.get_pos()
         col = mouse_x // c.TILE_SIZE
         row = mouse_y // c.TILE_SIZE
