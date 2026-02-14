@@ -1,7 +1,7 @@
 import pygame
-from tower import Tower
-from enemy import Enemy
-from systems.grid import Grid
+from entities.tower import Tower
+from entities.enemy import Enemy
+from entities.grid import Grid
 from utils import consts as c
 
 pygame.init()
@@ -15,6 +15,7 @@ path = [
     (0 * c.TILE_SIZE + c.TILE_SIZE // 2, 0 * c.TILE_SIZE + c.TILE_SIZE // 2),
     (7 * c.TILE_SIZE + c.TILE_SIZE // 2, 7 * c.TILE_SIZE + c.TILE_SIZE // 2)
     ]
+    
 #hold tower position and data
 towers = pygame.sprite.Group()
 enemies = pygame.sprite.Group()
