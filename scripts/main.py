@@ -1,7 +1,7 @@
 import pygame
 from tower import Tower
 from enemy import Enemy
-from systems.placement_system import Grid
+from systems.grid import Grid
 from utils import consts as c
 
 pygame.init()
