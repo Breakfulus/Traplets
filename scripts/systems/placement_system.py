@@ -38,7 +38,7 @@ class PlacementSystem:
         world_x = col * c.TILE_SIZE
         world_y = row * c.TILE_SIZE
 
-        new_obj = self.selected_blueprint(world_x, world_y, c.TILE_SIZE // 2)
+        new_obj = self.selected_blueprint(world_x, world_y)
 
         group.add(new_obj)
         self.grid.set_tile(row, col, new_obj)

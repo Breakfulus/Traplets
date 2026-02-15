@@ -1,8 +1,13 @@
 import pygame
+import utils.consts as c
 
 class Tower(pygame.sprite.Sprite):
-    def __init__(self, x, y, size, tower_type='basic', attack_style='ranged'):
+    def __init__(self, x, y, size=c.TILE_SIZE, tower_type='basic', attack_style='ranged'):
         pygame.sprite.Sprite.__init__(self)
+        self.footprint = [
+            [1, 1],
+            [1, 1]
+        ]
         self.x = x
         self.y = y
         self.pos = self.x, self.y
@@ -11,13 +16,11 @@ class Tower(pygame.sprite.Sprite):
         self.range = size * 2
         self.image = pygame.Surface((size, size))
         self.image.fill((200, 200, 200))
-        self.rect = self.image.get_rect(center=(self.x + size, self.y + size))
+        self.rect = self.image.get_rect(topleft=(self.x, self.y))
         
     def draw_range(self, surf):
         if self.selected:
             pygame.draw.circle(surf, "blue", (self.rect.centerx, self.rect.centery), self.range, 5)
 
-    def draw(self, screen):
-        self.rect.center = self.x, self.y
         
 

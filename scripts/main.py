@@ -29,8 +29,6 @@ new_enemy = Enemy(0, 0, c.TILE_SIZE / 2, path, 100, 2, 100, 100, 0)
 enemies.add(new_enemy)
 
 place_system = PlacementSystem(grid)
-
-place_system.mouse_position()
 place_system.selected_blueprint = Tower      
 
 def select_tower(mouse_pos):
