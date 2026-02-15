@@ -28,29 +28,9 @@ preview_tiles = set()
 new_enemy = Enemy(0, 0, c.TILE_SIZE / 2, path, 100, 2, 100, 100, 0)
 enemies.add(new_enemy)
 
-place_system = PlacementSystem(grid.grid)
+place_system = PlacementSystem(grid)
 
 place_system.mouse_position()
-
-def building_selection():
-    #drag selecting
-    if dragging:
-        tile_x, tile_y = mouse_pos[0] // c.TILE_SIZE, mouse_pos[1] // c.TILE_SIZE
-        if 0 <= tile_x < c.GRID_WIDTH and 0 <= tile_y < c.GRID_HEIGHT:
-            preview_tiles.add((tile_x, tile_y))
-            print(preview_tiles)
-
-def draw_selection():
-    selected_rect = pygame.Rect(tile[0] * c.TILE_SIZE, tile[1] * c.TILE_SIZE, c.TILE_SIZE, c.TILE_SIZE)
-    selected_tile  = pygame.Surface((c.TILE_SIZE, c.TILE_SIZE))
-    if grid.is_empty(tile[1],tile[0]):
-        color = (0, 200, 0)
-    else:
-        color = (200, 0, 0)
-    selected_tile.fill(color)
-    selected_tile.set_alpha(125)
-    screen.blit(selected_tile, selected_rect)
-    pygame.draw.rect(screen, (20, 20, 20, 50), selected_rect, 1)
             
 #Tower functions
 def place_tower(pos):
@@ -113,27 +93,27 @@ while running:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.__getattribute__('button') == 1:
                 if c.MODE == 0: 
-                    preview_tiles.clear()
-                    dragging = True
+                    place_system.preview_tiles.clear()
+                    place_system.dragging = True
                 else: 
-                    preview_tiles.clear()
-                    dragging = False
+                    place_system.preview_tiles.clear()
+                    place_system.dragging = False
                     select_tower(mouse_pos)
 
             elif event.__getattribute__('button') == 3:
                 #Cancel selection with right click while selecting
                 if c.MODE == 0:
-                    preview_tiles.clear()
-                    dragging = False
+                    place_system.preview_tiles.clear()
+                    place_system.dragging = False
                 #If not building and dragging right click quick destroy
                 elif c.MODE == 1:
-                    preview_tiles.clear()
-                    dragging = True     
+                    place_system.preview_tiles.clear()
+                    place_system.dragging = True     
         
         if event.type == pygame.MOUSEBUTTONUP:
             #stop selecting, place/destroy towers in building selection, and clear selection area
-            dragging = False
-            for tile in preview_tiles:
+            place_system.dragging = False
+            for tile in place_system.preview_tiles:
                     #Build towers
                     if grid.is_empty(tile[1], tile[0]) and c.MODE == 0:
                         place_tower((tile[0] * c.TILE_SIZE, tile[1] * c.TILE_SIZE))
@@ -142,9 +122,9 @@ while running:
                         for t in towers:
                             if t.rect.collidepoint(tile[0] * c.TILE_SIZE + c.TILE_SIZE // 2, tile[1] * c.TILE_SIZE + c.TILE_SIZE // 2):
                                 remove_tower(t)
-            preview_tiles.clear()
+            place_system.preview_tiles.clear()
     
-    building_selection()
+    place_system.building_selection()
     #Draw section
     screen.fill('darkslateblue')
 
@@ -164,8 +144,8 @@ while running:
     towers.draw(screen)
     
     #draw building selection
-    for tile in preview_tiles:
-        draw_selection()
+
+    place_system.draw(screen)
     
     
 
