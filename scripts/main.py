@@ -31,26 +31,7 @@ enemies.add(new_enemy)
 place_system = PlacementSystem(grid)
 
 place_system.mouse_position()
-            
-#Tower functions
-def place_tower(pos):
-    #Create new tower
-    new_tower = Tower(pos[0], pos[1], c.TILE_SIZE / 2)
-    #Check if tile already has tower in it
-    can_place = True
-    for  t in towers:
-        if t.rect.colliderect(new_tower):
-            can_place = False
-            print("Can't place here!")
-            break
-    for e in enemies:
-        if e.rect.colliderect(new_tower):
-            can_place = False
-    #only place if tile is empty
-    if can_place == True:
-        towers.add(new_tower)
-        grid.set_tile(new_tower.y // c.TILE_SIZE, new_tower.x // c.TILE_SIZE, 1)
-        print("Tower placed!")
+place_system.selected_blueprint = Tower      
 
 def select_tower(mouse_pos):
     #Clicking on tower selects it, clicking off tower deselects it
@@ -60,13 +41,6 @@ def select_tower(mouse_pos):
             t.selected = not t.selected
         else:
             t.selected = False
-
-def remove_tower(tower):
-    grid.set_tile(tower.y // c.TILE_SIZE, tower.x // c.TILE_SIZE, 0)
-    towers.remove(tower)
-    print("Tower removed!")
-
-dragging = False
 
 running = True
 while running:
@@ -111,17 +85,8 @@ while running:
                     place_system.dragging = True     
         
         if event.type == pygame.MOUSEBUTTONUP:
-            #stop selecting, place/destroy towers in building selection, and clear selection area
-            place_system.dragging = False
-            for tile in place_system.preview_tiles:
-                    #Build towers
-                    if grid.is_empty(tile[1], tile[0]) and c.MODE == 0:
-                        place_tower((tile[0] * c.TILE_SIZE, tile[1] * c.TILE_SIZE))
-                    #Destroy towers if in select c.mode dragging
-                    if not grid.is_empty(tile[1], tile[0]) and c.MODE == 1:
-                        for t in towers:
-                            if t.rect.collidepoint(tile[0] * c.TILE_SIZE + c.TILE_SIZE // 2, tile[1] * c.TILE_SIZE + c.TILE_SIZE // 2):
-                                remove_tower(t)
+            place_system.finalize_placement(towers)
+
             place_system.preview_tiles.clear()
     
     place_system.building_selection()

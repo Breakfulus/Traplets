@@ -7,12 +7,12 @@ class Grid:
         self.grid_width = grid_width
         self.tile_size = tile_size
         self.grid = [
-                    [0 for _ in range(self.grid_width)]
+                    [None for _ in range(self.grid_width)]
                     for _ in range(self.grid_height)
                 ]
     
     def is_empty(self, row, col):
-        return self.grid[row][col] == 0
+        return self.grid[row][col] == None
     
     def set_tile(self, row, col, value):
         self.grid[row][col] = value

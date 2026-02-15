@@ -6,7 +6,7 @@ class PlacementSystem:
         self.grid = grid
         self.preview_tiles = set()
         self.dragging = False
-        MODE = 0
+        self.selected_blueprint = None #What it is placing
 
     def mouse_position(self):
         mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -26,6 +26,28 @@ class PlacementSystem:
             if 0 <= tile_x < c.GRID_WIDTH and 0 <= tile_y < c.GRID_HEIGHT:
                 self.preview_tiles.add((tile_x, tile_y))
                 print(self.preview_tiles)
+    
+    def place(self, tile_pos, group):
+        if self.selected_blueprint == None:
+            return
+        row, col = tile_pos
+
+        if not self.grid.is_empty(row, col):
+            return
+        
+        world_x = col * c.TILE_SIZE
+        world_y = row * c.TILE_SIZE
+
+        new_obj = self.selected_blueprint(world_x, world_y, c.TILE_SIZE // 2)
+
+        group.add(new_obj)
+        self.grid.set_tile(row, col, 1)
+
+    def finalize_placement(self, group):
+        for tile in self.preview_tiles:
+            self.place((tile[1], tile[0]), group)
+        self.preview_tiles.clear()
+        self.dragging = False
 
     def draw_selection(self, surf):
         for tile in self.preview_tiles:
