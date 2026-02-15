@@ -85,7 +85,10 @@ while running:
                     place_system.dragging = True     
         
         if event.type == pygame.MOUSEBUTTONUP:
-            place_system.finalize_placement(towers)
+            if c.MODE == 0:
+                place_system.finalize_placement(towers)
+            else:
+                place_system.finalize_destruction()
 
             place_system.preview_tiles.clear()
     

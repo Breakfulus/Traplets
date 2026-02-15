@@ -13,6 +13,9 @@ class Grid:
     
     def is_empty(self, row, col):
         return self.grid[row][col] == None
+
+    def get_tile(self, row, col):
+        return self.grid[row][col]
     
     def set_tile(self, row, col, value):
         self.grid[row][col] = value

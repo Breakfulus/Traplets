@@ -41,7 +41,22 @@ class PlacementSystem:
         new_obj = self.selected_blueprint(world_x, world_y, c.TILE_SIZE // 2)
 
         group.add(new_obj)
-        self.grid.set_tile(row, col, 1)
+        self.grid.set_tile(row, col, new_obj)
+    
+    def destroy(self, tile_pos):
+        col, row = tile_pos
+        obj = self.grid.get_tile(row, col)
+        print(obj)
+        if obj:
+            obj.kill()
+            self.grid.set_tile(row, col, None)
+        
+        
+    def finalize_destruction(self):
+        for tile in self.preview_tiles:
+            self.destroy((tile[0], tile[1]))
+        self.preview_tiles.clear()
+        self.dragging = False
 
     def finalize_placement(self, group):
         for tile in self.preview_tiles:
