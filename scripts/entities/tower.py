@@ -2,12 +2,14 @@ import pygame
 import utils.consts as c
 
 class Tower(pygame.sprite.Sprite):
-    def __init__(self, x, y, size=c.TILE_SIZE, tower_type='basic', attack_style='ranged'):
-        pygame.sprite.Sprite.__init__(self)
-        self.footprint = [
+    footprint = [
             [1, 1],
             [1, 1]
         ]
+
+    def __init__(self, x, y, size=c.TILE_SIZE, tower_type='basic', attack_style='ranged'):
+        pygame.sprite.Sprite.__init__(self)
+        
         self.x = x
         self.y = y
         self.pos = self.x, self.y
