@@ -3,8 +3,7 @@ import utils.consts as c
 
 class Tower(pygame.sprite.Sprite):
     footprint = [
-            [1, 1],
-            [1, 1]
+            [1]
         ]
 
     def __init__(self, x, y, size=c.TILE_SIZE, tower_type='basic', attack_style='ranged'):
