@@ -89,7 +89,7 @@ class PlacementSystem:
         self.preview_tiles.clear()
         self.dragging = False
 
-    def finalize_placement(self, group):
+    def finalize_placement(self, group=None):
         for tile in self.preview_tiles:
             self.place(tile[1], tile[0], group)
         self.preview_tiles.clear()

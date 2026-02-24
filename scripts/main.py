@@ -1,6 +1,7 @@
 import pygame
-from entities.tower import Tower
-from entities.enemy import Enemy
+import entity
+#from entities.tower import Tower
+#from entities.enemy import Enemy
 from entities.grid import Grid
 from systems.placement_system import PlacementSystem
 import utils.consts as c
@@ -18,27 +19,27 @@ path = [
     ]
     
 #hold tower position and data
-towers = pygame.sprite.Group()
-enemies = pygame.sprite.Group()
+# towers = pygame.sprite.Group()
+# enemies = pygame.sprite.Group()
 
 grid = Grid(c.GRID_HEIGHT, c.GRID_WIDTH, c.TILE_SIZE)
 
 preview_tiles = set()
 
-new_enemy = Enemy(0, 0, c.TILE_SIZE / 2, path, 100, 2, 100, 100, 0)
-enemies.add(new_enemy)
+# new_enemy = Enemy(0, 0, c.TILE_SIZE / 2, path, 100, 2, 100, 100, 0)
+# enemies.add(new_enemy)
 
 place_system = PlacementSystem(grid)
-place_system.selected_blueprint = Tower      
+place_system.selected_blueprint = None      
 
-def select_tower(mouse_pos):
-    #Clicking on tower selects it, clicking off tower deselects it
-    for t in towers:
-        if t.rect.collidepoint(mouse_pos):
-            print("Tower  Clicked!")
-            t.selected = not t.selected
-        else:
-            t.selected = False
+# def select_tower(mouse_pos):
+#     #Clicking on tower selects it, clicking off tower deselects it
+#     for t in towers:
+#         if t.rect.collidepoint(mouse_pos):
+#             print("Tower  Clicked!")
+#             t.selected = not t.selected
+#         else:
+#             t.selected = False
 
 running = True
 while running:
@@ -84,7 +85,7 @@ while running:
         
         if event.type == pygame.MOUSEBUTTONUP:
             if c.MODE == 0:
-                place_system.finalize_placement(towers)
+                place_system.finalize_placement()
             else:
                 place_system.finalize_destruction()
 
@@ -100,14 +101,14 @@ while running:
     grid.get_mouse_tile_pos(mouse_pos)
     grid.draw_grid(screen)
 
-    enemies.update()
-    enemies.draw(screen)
+    # enemies.update()
+    # enemies.draw(screen)
 
-    #Draw towers
-    for t in towers:
-        t.draw_range(screen)
-    towers.update()
-    towers.draw(screen)
+    # #Draw towers
+    # for t in towers:
+    #     t.draw_range(screen)
+    # towers.update()
+    # towers.draw(screen)
     
     #draw building selection
 
