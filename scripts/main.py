@@ -1,5 +1,4 @@
 import pygame
-import entity
 #from entities.tower import Tower
 #from entities.enemy import Enemy
 from entities.grid import Grid
