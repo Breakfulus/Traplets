@@ -1,6 +1,8 @@
 import pygame
 #from entities.tower import Tower
 #from entities.enemy import Enemy
+from systems.entity_manager import EntityManager
+from utils.entity_definitions import ENEMY_DEFINITIONS
 from entities.grid import Grid
 from systems.placement_system import PlacementSystem
 import utils.consts as c
@@ -29,7 +31,7 @@ preview_tiles = set()
 # enemies.add(new_enemy)
 
 place_system = PlacementSystem(grid)
-place_system.selected_blueprint = None      
+place_system.selected_blueprint = None
 
 # def select_tower(mouse_pos):
 #     #Clicking on tower selects it, clicking off tower deselects it
@@ -39,6 +41,12 @@ place_system.selected_blueprint = None
 #             t.selected = not t.selected
 #         else:
 #             t.selected = False
+
+manager = EntityManager()
+enemy_blueprint = ENEMY_DEFINITIONS['mushant']
+
+mushant_enemy = manager.create_entity(enemy_blueprint, (0, 0), 'enemy')
+print(mushant_enemy.movement_component['speed'])
 
 running = True
 while running:

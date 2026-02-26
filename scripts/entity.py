@@ -8,9 +8,9 @@ class Entity:
 
         self.position = position
         self.team = team
-        self.type = entity_type
+        self.type = None
 
         #component block
-        placement_component = None
-        movement_component = None
-        rendering_component = None
+        self.placement_component = None
+        self.movement_component = None
+        self.rendering_component = None
