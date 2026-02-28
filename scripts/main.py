@@ -119,8 +119,9 @@ while running:
     
     #draw building selection
 
-    place_system.draw(screen)
     
+    manager.render_entities(screen)
+    place_system.draw(screen)
     
 
     pygame.display.flip()

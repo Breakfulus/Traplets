@@ -1,5 +1,6 @@
 import pygame
 from entity import Entity
+from utils.helpers import load_image
 
 class EntityManager:
     def __init__(self):
@@ -16,10 +17,12 @@ class EntityManager:
         self.entities.append(entity)
         return entity
     
-    def render_entities(screen):
+    def render_entities(self, screen):
         for entity in self.entities:
             if entity.rendering_component:
-                screen.blit(entity.rendering_component.image, entity.rendering_component.image_rect)
+                entity_image = entity.rendering_component['image']
+                entity_image = load_image(entity_image)
+                screen.blit(entity_image, entity_image.get_rect())
 
 
 """MAKE ONE SINGLE ENTITY THAT SPAWNS AND RENDERS A SQUARE

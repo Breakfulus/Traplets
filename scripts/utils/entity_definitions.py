@@ -15,7 +15,7 @@ ENEMY_DEFINITIONS = {
             'speed': 0.25,
         },
         "rendering_component":{
-            'image': None
+            'image': "red_cube.png"
         }
     },
 }
