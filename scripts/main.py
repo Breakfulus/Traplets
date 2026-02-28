@@ -48,6 +48,8 @@ enemy_blueprint = ENEMY_DEFINITIONS['mushant']
 mushant_enemy = manager.create_entity(enemy_blueprint, (0, 0), 'enemy')
 print(mushant_enemy.movement_component['speed'])
 
+manager.load_entity_images()
+
 running = True
 while running:
     mouse_pos = place_system.mouse_position()
