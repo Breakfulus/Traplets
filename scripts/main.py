@@ -3,6 +3,7 @@ import pygame
 #from entities.enemy import Enemy
 from systems.entity_manager import EntityManager
 from utils.entity_definitions import ENEMY_DEFINITIONS
+from utils.entity_definitions import TOWER_DEFINITIONS
 from entities.grid import Grid
 from systems.placement_system import PlacementSystem
 import utils.consts as c
@@ -31,7 +32,8 @@ preview_tiles = set()
 # enemies.add(new_enemy)
 
 place_system = PlacementSystem(grid)
-place_system.selected_blueprint = None
+
+PLACETOWER = pygame.USEREVENT + 1
 
 # def select_tower(mouse_pos):
 #     #Clicking on tower selects it, clicking off tower deselects it
@@ -99,6 +101,9 @@ while running:
                 place_system.finalize_destruction()
 
             place_system.preview_tiles.clear()
+        
+        if event.type == PLACETOWER:
+            manager.create_entity(event.blueprint, event.pos, event.team)
     
     place_system.building_selection()
     #Draw section

@@ -1,12 +1,15 @@
 import pygame
 import utils.consts as c
+from utils.entity_definitions import TOWER_DEFINITIONS
+
+PLACETOWER = pygame.USEREVENT + 1
 
 class PlacementSystem:
     def __init__(self, grid):
         self.grid = grid
         self.preview_tiles = set()
         self.dragging = False
-        self.selected_blueprint = None #What it is placing
+        self.selected_blueprint = TOWER_DEFINITIONS['mushant'] #What it is placing
 
     def mouse_position(self):
         mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -28,7 +31,15 @@ class PlacementSystem:
                 print(self.preview_tiles)
     
     def can_place(self, start_row, start_col):
-        self.footprint = self.selected_blueprint.footprint
+        for comp_name, comp_stats in self.selected_blueprint.items():
+            if comp_name == 'placement_component':
+                tower_placement_comp = comp_stats
+                for stat_name, stat in tower_placement_comp.items():
+                    if stat_name == 'footprint':
+                        footprint = stat
+
+        self.footprint = self.selected_blueprint['placement_component']
+        self.footprint = self.footprint['footprint']
 
         for r in range(len(self.footprint)):
             for c_ in range(len(self.footprint[r])):
@@ -49,7 +60,7 @@ class PlacementSystem:
         return True
 
 
-    def place(self, start_row, start_col, group):
+    def place(self, start_row, start_col):
         if self.selected_blueprint == None:
             return
 
@@ -58,9 +69,8 @@ class PlacementSystem:
         
         world_x = start_col * c.TILE_SIZE
         world_y = start_row * c.TILE_SIZE
-
-        new_obj = self.selected_blueprint(world_x, world_y)
-        group.add(new_obj)
+        place_tower_event = pygame.event.Event(PLACETOWER, pos=(world_x, world_y), blueprint=self.selected_blueprint, team='player')
+        pygame.event.post(place_tower_event)
 
         for r in range(len(self.footprint)):
             for c_ in range(len(self.footprint[r])):
@@ -69,18 +79,18 @@ class PlacementSystem:
             
                 grid_row = start_row + r
                 grid_col = start_col + c_
-                self.grid.set_tile(grid_row, grid_col, new_obj)
+                self.grid.set_tile(grid_row, grid_col, 1)
     
     def destroy(self, row, col):
         obj = self.grid.get_tile(row, col)
         if not obj:
             return
         print(obj)
-        obj.kill()
+        obj.alive = False
         for r in range(self.grid.grid_height):
             for c_ in range(self.grid.grid_width):
                 if self.grid.get_tile(r, c_) == obj:
-                    self.grid.set_tile(r, c_, None)
+                    self.grid.set_tile(r, c_, 0)
         
         
     def finalize_destruction(self):
@@ -89,9 +99,9 @@ class PlacementSystem:
         self.preview_tiles.clear()
         self.dragging = False
 
-    def finalize_placement(self, group=None):
+    def finalize_placement(self):
         for tile in self.preview_tiles:
-            self.place(tile[1], tile[0], group)
+            self.place(tile[1], tile[0])
         self.preview_tiles.clear()
         self.dragging = False
 

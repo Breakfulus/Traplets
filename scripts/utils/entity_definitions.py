@@ -15,7 +15,8 @@ ENEMY_DEFINITIONS = {
             'speed': 0.25,
         },
         "rendering_component":{
-            'image': "red_cube.png"
+            'image path': "red_cube.png",
+            'image': None
         }
     },
 }
@@ -32,7 +33,11 @@ TOWER_DEFINITIONS = {
             'damage': 5
         },
         "rendering_component":{
+            'image path': "red_cube.png",
             'image': None
+        },
+        "placement_component":{
+            'footprint': [[1]]
         }
     },
 }
