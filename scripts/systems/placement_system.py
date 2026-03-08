@@ -82,14 +82,9 @@ class PlacementSystem:
                 self.grid.set_tile(grid_row, grid_col, 1)
     
     def destroy(self, row, col):
-        obj = self.grid.get_tile(row, col)
-        if not obj:
-            return
-        print(obj)
-        obj.alive = False
         for r in range(self.grid.grid_height):
             for c_ in range(self.grid.grid_width):
-                if self.grid.get_tile(r, c_) == obj:
+                if self.grid.get_tile(r, c_) != 0:
                     self.grid.set_tile(r, c_, 0)
         
         
