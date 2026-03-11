@@ -1,6 +1,7 @@
 import pygame
 import utils.consts as c
 from utils.entity_definitions import TOWER_DEFINITIONS
+from entity import Entity
 
 PLACETOWER = pygame.USEREVENT + 1
 
@@ -31,20 +32,12 @@ class PlacementSystem:
                 print(self.preview_tiles)
     
     def can_place(self, start_row, start_col):
-        for comp_name, comp_stats in self.selected_blueprint.items():
-            if comp_name == 'placement_component':
-                tower_placement_comp = comp_stats
-                for stat_name, stat in tower_placement_comp.items():
-                    if stat_name == 'footprint':
-                        footprint = stat
-
-        self.footprint = self.selected_blueprint['placement_component']
-        self.footprint = self.footprint['footprint']
+        self.footprint = self.selected_blueprint['placement_component']['footprint']
 
         for r in range(len(self.footprint)):
             for c_ in range(len(self.footprint[r])):
 
-                if self.footprint[r][c_] != 1:
+                if self.footprint[r][c_] == 0:
                     continue
             
                 grid_row = start_row + r
@@ -67,6 +60,8 @@ class PlacementSystem:
         if not self.can_place(start_row, start_col):
             return
         
+        entity_id = Entity.reserve_id()
+        
         world_x = start_col * c.TILE_SIZE
         world_y = start_row * c.TILE_SIZE
         place_tower_event = pygame.event.Event(PLACETOWER, pos=(world_x, world_y), blueprint=self.selected_blueprint, team='player')
@@ -74,29 +69,34 @@ class PlacementSystem:
 
         for r in range(len(self.footprint)):
             for c_ in range(len(self.footprint[r])):
-                if self.footprint[r][c_] != 1:
+                if self.footprint[r][c_] == 0:
                     continue
             
                 grid_row = start_row + r
                 grid_col = start_col + c_
-                self.grid.set_tile(grid_row, grid_col, 1)
+                self.grid.set_tile(grid_row, grid_col, entity_id)
     
-    def destroy(self, row, col):
+    def destroy(self, row, col, tile):
+
+        obj = self.grid.get_tile(tile[1], tile[0])
+
         for r in range(self.grid.grid_height):
             for c_ in range(self.grid.grid_width):
-                if self.grid.get_tile(r, c_) != 0:
-                    self.grid.set_tile(r, c_, 0)
+                if self.grid.get_tile(r, c_) == obj:
+                    self.grid.set_tile(r, c_, None)
         
         
     def finalize_destruction(self):
         for tile in self.preview_tiles:
-            self.destroy(tile[0], tile[1])
+            self.destroy(tile[0], tile[1], tile)
+
         self.preview_tiles.clear()
         self.dragging = False
-
+        
     def finalize_placement(self):
         for tile in self.preview_tiles:
             self.place(tile[1], tile[0])
+        print(self.grid.grid)
         self.preview_tiles.clear()
         self.dragging = False
 

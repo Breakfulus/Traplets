@@ -1,6 +1,4 @@
 import pygame
-#from entities.tower import Tower
-#from entities.enemy import Enemy
 from systems.entity_manager import EntityManager
 from utils.entity_definitions import ENEMY_DEFINITIONS
 from utils.entity_definitions import TOWER_DEFINITIONS
@@ -19,36 +17,19 @@ path = [
     (0 * c.TILE_SIZE + c.TILE_SIZE // 2, 0 * c.TILE_SIZE + c.TILE_SIZE // 2),
     (7 * c.TILE_SIZE + c.TILE_SIZE // 2, 7 * c.TILE_SIZE + c.TILE_SIZE // 2)
     ]
-    
-#hold tower position and data
-# towers = pygame.sprite.Group()
-# enemies = pygame.sprite.Group()
 
 grid = Grid(c.GRID_HEIGHT, c.GRID_WIDTH, c.TILE_SIZE)
 
 preview_tiles = set()
 
-# new_enemy = Enemy(0, 0, c.TILE_SIZE / 2, path, 100, 2, 100, 100, 0)
-# enemies.add(new_enemy)
-
 place_system = PlacementSystem(grid)
 
 PLACETOWER = pygame.USEREVENT + 1
-
-# def select_tower(mouse_pos):
-#     #Clicking on tower selects it, clicking off tower deselects it
-#     for t in towers:
-#         if t.rect.collidepoint(mouse_pos):
-#             print("Tower  Clicked!")
-#             t.selected = not t.selected
-#         else:
-#             t.selected = False
 
 manager = EntityManager()
 enemy_blueprint = ENEMY_DEFINITIONS['mushant']
 
 mushant_enemy = manager.create_entity(enemy_blueprint, (0, 0), 'enemy')
-print(mushant_enemy.movement_component['speed'])
 
 running = True
 while running:
@@ -80,7 +61,6 @@ while running:
                 else: 
                     place_system.preview_tiles.clear()
                     place_system.dragging = False
-                    select_tower(mouse_pos)
 
             elif event.__getattribute__('button') == 3:
                 #Cancel selection with right click while selecting
@@ -112,18 +92,6 @@ while running:
     
     grid.get_mouse_tile_pos(mouse_pos)
     grid.draw_grid(screen)
-
-    # enemies.update()
-    # enemies.draw(screen)
-
-    # #Draw towers
-    # for t in towers:
-    #     t.draw_range(screen)
-    # towers.update()
-    # towers.draw(screen)
-    
-    #draw building selection
-
     
     manager.render_entities(screen)
     place_system.draw(screen)
@@ -133,9 +101,3 @@ while running:
     clock.tick(60)
 
 pygame.quit()
-'''TODO: Make Grid
-make enemies spawn on E
-Make buildings
-Make enemies pathfind to buildings
-Combat system
-'''
