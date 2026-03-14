@@ -25,6 +25,7 @@ preview_tiles = set()
 place_system = PlacementSystem(grid)
 
 PLACETOWER = pygame.USEREVENT + 1
+DESTROYTOWER = pygame.USEREVENT + 2
 
 manager = EntityManager()
 enemy_blueprint = ENEMY_DEFINITIONS['mushant']
@@ -81,7 +82,10 @@ while running:
             place_system.preview_tiles.clear()
         
         if event.type == PLACETOWER:
-            manager.create_entity(event.blueprint, event.pos, event.team)
+            manager.create_entity(event.blueprint, event.pos, event.team, event.eid)
+
+        if event.type == DESTROYTOWER:
+            manager.kill_entity(event.eid)
     
     place_system.building_selection()
     #Draw section
@@ -96,7 +100,7 @@ while running:
     manager.render_entities(screen)
     place_system.draw(screen)
     
-
+    manager.entity_clean_up()
     pygame.display.flip()
     clock.tick(60)
 

@@ -4,6 +4,7 @@ from utils.entity_definitions import TOWER_DEFINITIONS
 from entity import Entity
 
 PLACETOWER = pygame.USEREVENT + 1
+DESTROYTOWER = pygame.USEREVENT + 2
 
 class PlacementSystem:
     def __init__(self, grid):
@@ -64,7 +65,7 @@ class PlacementSystem:
         
         world_x = start_col * c.TILE_SIZE
         world_y = start_row * c.TILE_SIZE
-        place_tower_event = pygame.event.Event(PLACETOWER, pos=(world_x, world_y), blueprint=self.selected_blueprint, team='player')
+        place_tower_event = pygame.event.Event(PLACETOWER, pos=(world_x, world_y), blueprint=self.selected_blueprint, team='player', eid=entity_id)
         pygame.event.post(place_tower_event)
 
         for r in range(len(self.footprint)):
@@ -77,8 +78,10 @@ class PlacementSystem:
                 self.grid.set_tile(grid_row, grid_col, entity_id)
     
     def destroy(self, row, col, tile):
-
         obj = self.grid.get_tile(tile[1], tile[0])
+        if obj and obj != None:
+            destroy_tower_event = pygame.event.Event(DESTROYTOWER, eid=obj)
+            pygame.event.post(destroy_tower_event)
 
         for r in range(self.grid.grid_height):
             for c_ in range(self.grid.grid_width):
@@ -86,9 +89,12 @@ class PlacementSystem:
                     self.grid.set_tile(r, c_, None)
         
         
+        
+        
     def finalize_destruction(self):
         for tile in self.preview_tiles:
             self.destroy(tile[0], tile[1], tile)
+            
 
         self.preview_tiles.clear()
         self.dragging = False

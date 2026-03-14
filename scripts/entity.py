@@ -9,10 +9,10 @@ class Entity:
         cls.__next_id__ += 1
         return entity_id
         
-    def __init__(self, position, team):
-        self.id = Entity.__next_id__
-        Entity.__next_id__ += 1
+    def __init__(self, position, team, eid=None):
+        self.id = eid
 
         self.position = position
         self.team = team
         self.type = None
+        self.alive = True
