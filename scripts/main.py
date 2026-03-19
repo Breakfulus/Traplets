@@ -1,5 +1,6 @@
 import pygame
 import heapq
+import random
 from systems.entity_manager import EntityManager
 from utils.entity_definitions import ENEMY_DEFINITIONS
 from utils.entity_definitions import TOWER_DEFINITIONS
@@ -48,23 +49,23 @@ class Node:
     def __lt__(self, other):
         return self.f < other.f
 
-def get_neighbors(grid, x, y):
+def get_neighbors(grid, row, col):
     
     #Make sure the bounds check comes before detecting if the tile is filed.
     
     neighbors = []
 
-    if y > 0:
-        neighbors.append((x, y - 1))
+    if row > 0 and grid.is_empty(row - 1, col):
+        neighbors.append((row - 1, col))
     
-    if x > 0:
-        neighbors.append((x - 1, y))
+    if col > 0 and grid.is_empty(row, col - 1):
+        neighbors.append((row, col - 1))
 
-    if y < c.GRID_HEIGHT - 1:
-        neighbors.append((x, y + 1))
+    if row < c.GRID_HEIGHT - 1 and grid.is_empty(row + 1, col):
+        neighbors.append((row + 1, col))
     
-    if x < c.GRID_WIDTH - 1:
-        neighbors.append((x + 1, y))
+    if col < c.GRID_WIDTH - 1 and grid.is_empty(row, col + 1):
+        neighbors.append((row, col + 1))
 
     return neighbors
 
@@ -78,7 +79,34 @@ def a_star_algorithm(grid, start_tile, goal_tile):
     g_score = {start_tile: 0}
     closed_set = set()
 
-    while open_list: #while there are explorable tiles
+    goal_x, goal_y = goal_tile
+    if grid.get_tile(goal_x, goal_y) != None:
+            best_tile = None
+            best_distance = float('inf')
+
+            neighbors = get_neighbors(grid, goal_x, goal_y)
+
+            for row, col in neighbors:
+                if 0 <= row < grid.grid_height and 0 <= col < grid.grid_width:
+                    if grid.is_empty(row, col):
+
+                        # convert tile → pixel center
+                        tile_x = col * c.TILE_SIZE + c.TILE_SIZE // 2
+                        tile_y = row * c.TILE_SIZE + c.TILE_SIZE // 2
+
+                        dx = tile_x - mushant_enemy.position[0]
+                        dy = tile_y - mushant_enemy.position[1]
+
+                        distance = dx*dx + dy*dy  # squared distance (faster, no sqrt)
+
+                        if distance < best_distance:
+                            best_distance = distance
+                            best_tile = (row, col)  # return as (x, y)
+                            print(best_tile)
+
+            goal_tile = best_tile
+
+    while open_list and goal_tile != None: #while there are explorable tiles
         current = heapq.heappop(open_list) #takes what is currently explorable and processes it
 
         if current.position in closed_set: #if its already explored, skip the tile
@@ -140,13 +168,15 @@ while running:
             manager.create_entity(event.blueprint, event.pos, event.team, event.eid)
             
             build_x, build_y = event.pos
-            goal_tile = (build_x // c.TILE_SIZE, build_y // c.TILE_SIZE)
-            start_tile = (mushant_enemy.position[0] // c.TILE_SIZE, mushant_enemy.position[1] // c.TILE_SIZE)
+            goal_tile = [build_y // c.TILE_SIZE, build_x // c.TILE_SIZE]
+            start_tile = (int(mushant_enemy.position[1] // c.TILE_SIZE), int(mushant_enemy.position[0] // c.TILE_SIZE))
+
             path_tiles = a_star_algorithm(grid, start_tile, goal_tile)
-            pixel_path = [(x * c.TILE_SIZE, y * c.TILE_SIZE) for (x, y) in path_tiles]
-            movement = getattr(mushant_enemy, "movement_component", None)
-            movement['path'] = pixel_path
-            movement['target_index'] = 0
+            if path_tiles:
+                pixel_path = [(y * c.TILE_SIZE, x * c.TILE_SIZE) for (x, y) in path_tiles]
+                movement = getattr(mushant_enemy, "movement_component", None)
+                movement['path'] = pixel_path
+                movement['target_index'] = 0
 
         if event.type == DESTROYTOWER:
             manager.kill_entity(event.eid)
