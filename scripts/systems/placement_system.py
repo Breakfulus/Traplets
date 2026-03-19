@@ -121,3 +121,31 @@ class PlacementSystem:
     
     def draw(self, surf):
         self.draw_selection(surf)
+
+    def placement_system_events(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.__getattribute__('button') == 1:
+                if c.MODE == 0: 
+                    self.preview_tiles.clear()
+                    self.dragging = True
+                else: 
+                    self.preview_tiles.clear()
+                    self.dragging = False
+
+            elif event.__getattribute__('button') == 3:
+                #Cancel selection with right click while selecting
+                if c.MODE == 0:
+                    self.preview_tiles.clear()
+                    self.dragging = False
+                #If not building and dragging right click quick destroy
+                elif c.MODE == 1:
+                    self.preview_tiles.clear()
+                    self.dragging = True     
+        
+        if event.type == pygame.MOUSEBUTTONUP:
+            if c.MODE == 0:
+                self.finalize_placement()
+            else:
+                self.finalize_destruction()
+
+            self.preview_tiles.clear()

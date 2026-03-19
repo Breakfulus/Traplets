@@ -46,40 +46,13 @@ while running:
                 pygame.display.toggle_fullscreen()
 
             if event.key == pygame.K_DELETE or event.key == pygame.K_BACKSPACE:
-                for t in towers:
-                    if t.selected:
-                        remove_tower(t)
+                pass
         
             if event.key == pygame.K_c:
                 if c.MODE == 0: c.MODE = 1
                 else: c.MODE = 0
 
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if event.__getattribute__('button') == 1:
-                if c.MODE == 0: 
-                    place_system.preview_tiles.clear()
-                    place_system.dragging = True
-                else: 
-                    place_system.preview_tiles.clear()
-                    place_system.dragging = False
-
-            elif event.__getattribute__('button') == 3:
-                #Cancel selection with right click while selecting
-                if c.MODE == 0:
-                    place_system.preview_tiles.clear()
-                    place_system.dragging = False
-                #If not building and dragging right click quick destroy
-                elif c.MODE == 1:
-                    place_system.preview_tiles.clear()
-                    place_system.dragging = True     
-        
-        if event.type == pygame.MOUSEBUTTONUP:
-            if c.MODE == 0:
-                place_system.finalize_placement()
-            else:
-                place_system.finalize_destruction()
-
-            place_system.preview_tiles.clear()
+        place_system.placement_system_events(event)
         
         if event.type == PLACETOWER:
             manager.create_entity(event.blueprint, event.pos, event.team, event.eid)
