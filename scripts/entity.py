@@ -12,7 +12,7 @@ class Entity:
     def __init__(self, position, team, eid=None):
         self.id = eid
 
-        self.position = position
+        self.position = list(position)
         self.team = team
         self.type = None
         self.alive = True

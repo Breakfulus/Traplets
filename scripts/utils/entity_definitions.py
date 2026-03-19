@@ -12,7 +12,9 @@ ENEMY_DEFINITIONS = {
             'damage': 5
         },
         'movement_component': {
-            'speed': 0.25,
+            'speed': 3,
+            'path': [],
+            'target_index': 0
         },
         "rendering_component":{
             'image path': "red_cube.png",
