@@ -14,7 +14,9 @@ ENEMY_DEFINITIONS = {
         'movement_component': {
             'speed': 3,
             'path': [],
-            'target_index': 0
+            'target_index': 0,
+            'needs_path': True,
+            'goal': None
         },
         "rendering_component":{
             'image path': "red_cube.png",

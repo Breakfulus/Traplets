@@ -5,6 +5,7 @@ from utils.helpers import load_image
 class EntityManager:
     def __init__(self):
         self.entities = {}
+        self.enemies = {}
 
     def create_entity(self, blueprint, pos, team, eid=None):
         if eid == None:
@@ -15,8 +16,11 @@ class EntityManager:
             setattr(entity, comp_name, comp_stats.copy())
 
         self.entities[eid] = entity
+        if hasattr(entity, "movement_component"):
+            self.enemies[eid] = entity
         self.load_entity_images(entity)
         print(f"Entity {entity.id} has been created!")
+        print(self.enemies)
         return entity
     
     def kill_entity(self, entity_id):
