@@ -13,7 +13,6 @@ class MovementSystem:
         target = movement['target_index']
 
         if target != None: 
-            print(target)
             #move if the target has more points in its path
             target_waypoint = path[target]
             dx  = target_waypoint[0] - entity.position[0]

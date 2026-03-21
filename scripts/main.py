@@ -28,6 +28,7 @@ pathfinding_system = PathfindingSystem()
 
 PLACETOWER = pygame.USEREVENT + 1
 DESTROYTOWER = pygame.USEREVENT + 2
+SELECTTOWER = pygame.USEREVENT + 3
 
 manager = EntityManager()
 
@@ -68,6 +69,10 @@ while running:
 
         if event.type == DESTROYTOWER:
             manager.kill_entity(event.eid)
+        
+        if event.type == SELECTTOWER:
+            print(f"Entity {event.eid} selected!")
+            manager.select_entity(event.eid)
     
     place_system.building_selection()
     #Draw section

@@ -20,7 +20,8 @@ ENEMY_DEFINITIONS = {
         },
         "rendering_component":{
             'image path': "red_cube.png",
-            'image': None
+            'image': None,
+            'image_rect': None
         }
     },
 }
@@ -38,10 +39,13 @@ TOWER_DEFINITIONS = {
         },
         "rendering_component":{
             'image path': "red_cube.png",
-            'image': None
+            'image': None,
+            'image_rect': None
         },
-        "placement_component":{
-            'footprint': [[1]]
+        "structure_component":{
+            'footprint': [[1]],
+            'selectable': True,
+            'selected': False
         }
     },
 }

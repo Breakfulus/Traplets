@@ -5,6 +5,7 @@ from entity import Entity
 
 PLACETOWER = pygame.USEREVENT + 1
 DESTROYTOWER = pygame.USEREVENT + 2
+SELECTTOWER = pygame.USEREVENT + 3
 
 class PlacementSystem:
     def __init__(self, grid):
@@ -33,7 +34,7 @@ class PlacementSystem:
                 print(self.preview_tiles)
     
     def can_place(self, start_row, start_col):
-        self.footprint = self.selected_blueprint['placement_component']['footprint']
+        self.footprint = self.selected_blueprint['structure_component']['footprint']
 
         for r in range(len(self.footprint)):
             for c_ in range(len(self.footprint[r])):
@@ -88,9 +89,6 @@ class PlacementSystem:
                 if self.grid.get_tile(r, c_) == obj:
                     self.grid.set_tile(r, c_, None)
         
-        
-        
-        
     def finalize_destruction(self):
         for tile in self.preview_tiles:
             self.destroy(tile[0], tile[1], tile)
@@ -131,12 +129,21 @@ class PlacementSystem:
                 else: 
                     self.preview_tiles.clear()
                     self.dragging = False
+                    mouse_pos = pygame.mouse.get_pos()
+                    tile_clicked = mouse_pos[0] // c.TILE_SIZE, mouse_pos[1] // c.TILE_SIZE
+                    print(f"Tile: {tile_clicked}")
+
+                    tile_id = self.grid.get_tile(tile_clicked[1], tile_clicked[0])
+                    select_tower_event = pygame.event.Event(SELECTTOWER, eid=tile_id)
+                    print(tile_id)
+                    pygame.event.post(select_tower_event)
 
             elif event.__getattribute__('button') == 3:
                 #Cancel selection with right click while selecting
                 if c.MODE == 0:
                     self.preview_tiles.clear()
                     self.dragging = False
+
                 #If not building and dragging right click quick destroy
                 elif c.MODE == 1:
                     self.preview_tiles.clear()

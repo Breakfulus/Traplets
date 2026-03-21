@@ -1,6 +1,7 @@
 import pygame
 from entity import Entity
 from utils.helpers import load_image
+import utils.consts as c
 
 class EntityManager:
     def __init__(self):
@@ -44,9 +45,22 @@ class EntityManager:
             if entity.rendering_component and entity.rendering_component['image'] != None:
                 entity_image = entity.rendering_component['image']
                 rect = entity_image.get_rect()
+                entity.rendering_component['image_rect'] = rect
                 rect.topleft = entity.position
                 screen.blit(entity_image, rect)
+            
+            if hasattr(entity, 'structure_component') and entity.structure_component['selectable']:
+                if entity.structure_component.get('selected'):
+                    pygame.draw.circle(screen, 'red', entity.rendering_component.get('image_rect').center, entity.combat_component['range'] * c.TILE_SIZE, 5)
             
 
             if not entity.rendering_component['image']:
                 print(f"Entity {entity.id} has no image?!?")
+    
+    def select_entity(self, eid):
+        for entity_id, entity in self.entities.items():
+            if hasattr(entity, 'structure_component'):
+                entity.structure_component['selected'] = False
+        if eid != None:
+            entity = self.entities[eid]
+            entity.structure_component['selected'] = True
