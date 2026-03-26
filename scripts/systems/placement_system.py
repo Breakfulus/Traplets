@@ -50,7 +50,7 @@ class PlacementSystem:
                 if grid_col < 0 or grid_col >= c.GRID_WIDTH:
                     return False
                 
-                if not self.grid.is_empty(grid_row, grid_col):
+                if not self.grid.is_not_blocked(grid_row, grid_col):
                     return False
         return True
 
@@ -76,18 +76,18 @@ class PlacementSystem:
             
                 grid_row = start_row + r
                 grid_col = start_col + c_
-                self.grid.set_tile(grid_row, grid_col, entity_id)
+                self.grid.add_to_tile(grid_row, grid_col, c.STRUCTURES, entity_id)
     
     def destroy(self, row, col, tile):
-        obj = self.grid.get_tile(tile[1], tile[0])
+        obj = self.grid.get_tile(tile[1], tile[0], c.STRUCTURES)
         if obj and obj != None:
-            destroy_tower_event = pygame.event.Event(DESTROYTOWER, eid=obj)
+            destroy_tower_event = pygame.event.Event(DESTROYTOWER, eid=obj[0])
             pygame.event.post(destroy_tower_event)
 
         for r in range(self.grid.grid_height):
             for c_ in range(self.grid.grid_width):
-                if self.grid.get_tile(r, c_) == obj:
-                    self.grid.set_tile(r, c_, None)
+                if self.grid.get_tile(r, c_, c.STRUCTURES) == obj:
+                    self.grid.remove_from_tile(r, c_, c.STRUCTURES, obj)
         
     def finalize_destruction(self):
         for tile in self.preview_tiles:
@@ -108,7 +108,7 @@ class PlacementSystem:
         for tile in self.preview_tiles:
             selected_rect = pygame.Rect(tile[0] * c.TILE_SIZE, tile[1] * c.TILE_SIZE, c.TILE_SIZE, c.TILE_SIZE)
             selected_tile  = pygame.Surface((c.TILE_SIZE, c.TILE_SIZE))
-            if self.grid.is_empty(tile[1],tile[0]):
+            if self.grid.is_not_blocked(tile[1],tile[0]):
                 color = (0, 200, 0)
             else:
                 color = (200, 0, 0)
@@ -133,7 +133,7 @@ class PlacementSystem:
                     tile_clicked = mouse_pos[0] // c.TILE_SIZE, mouse_pos[1] // c.TILE_SIZE
                     print(f"Tile: {tile_clicked}")
 
-                    tile_id = self.grid.get_tile(tile_clicked[1], tile_clicked[0])
+                    tile_id = self.grid.get_tile(tile_clicked[1], tile_clicked[0], c.STRUCTURES)
                     select_tower_event = pygame.event.Event(SELECTTOWER, eid=tile_id)
                     print(tile_id)
                     pygame.event.post(select_tower_event)

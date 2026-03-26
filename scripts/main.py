@@ -14,10 +14,7 @@ pygame.display.set_caption("Traplet Tower Defense")
 
 clock = pygame.time.Clock()
 
-path = [
-    (0 * c.TILE_SIZE + c.TILE_SIZE // 2, 0 * c.TILE_SIZE + c.TILE_SIZE // 2),
-    (7 * c.TILE_SIZE + c.TILE_SIZE // 2, 7 * c.TILE_SIZE + c.TILE_SIZE // 2)
-    ]
+path = []
 
 grid = Grid(c.GRID_HEIGHT, c.GRID_WIDTH, c.TILE_SIZE)
 

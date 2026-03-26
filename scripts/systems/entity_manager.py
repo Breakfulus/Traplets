@@ -25,6 +25,7 @@ class EntityManager:
         return entity
     
     def kill_entity(self, entity_id):
+        print(entity_id)
         entity = self.entities[entity_id]
         entity.alive = False
     
@@ -48,7 +49,8 @@ class EntityManager:
                 entity.rendering_component['image_rect'] = rect
                 rect.topleft = entity.position
                 screen.blit(entity_image, rect)
-            
+        
+        for entity in sorted_entities:
             if hasattr(entity, 'structure_component') and entity.structure_component['selectable']:
                 if entity.structure_component.get('selected'):
                     pygame.draw.circle(screen, 'red', entity.rendering_component.get('image_rect').center, entity.combat_component['range'] * c.TILE_SIZE, 5)

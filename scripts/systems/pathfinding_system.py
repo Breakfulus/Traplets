@@ -24,16 +24,16 @@ class PathfindingSystem:
         
         neighbors = []
 
-        if row > 0 and grid.is_empty(row - 1, col):
+        if row > 0 and grid.is_not_blocked(row - 1, col):
             neighbors.append((row - 1, col))
         
-        if col > 0 and grid.is_empty(row, col - 1):
+        if col > 0 and grid.is_not_blocked(row, col - 1):
             neighbors.append((row, col - 1))
 
-        if row < c.GRID_HEIGHT - 1 and grid.is_empty(row + 1, col):
+        if row < c.GRID_HEIGHT - 1 and grid.is_not_blocked(row + 1, col):
             neighbors.append((row + 1, col))
         
-        if col < c.GRID_WIDTH - 1 and grid.is_empty(row, col + 1):
+        if col < c.GRID_WIDTH - 1 and grid.is_not_blocked(row, col + 1):
             neighbors.append((row, col + 1))
 
         return neighbors
@@ -49,7 +49,7 @@ class PathfindingSystem:
         closed_set = set()
 
         goal_x, goal_y = goal_tile
-        if grid.get_tile(goal_x, goal_y) != None:
+        if grid.get_tile(goal_x, goal_y, c.STRUCTURES) != None:
                 best_tile = None
                 best_distance = float('inf')
 
@@ -57,7 +57,7 @@ class PathfindingSystem:
 
                 for row, col in neighbors:
                     if 0 <= row < grid.grid_height and 0 <= col < grid.grid_width:
-                        if grid.is_empty(row, col):
+                        if grid.is_not_blocked(row, col):
 
                             # convert tile → pixel center
                             tile_x = col * c.TILE_SIZE + c.TILE_SIZE // 2
@@ -96,8 +96,9 @@ class PathfindingSystem:
 
             for nx, ny in neighbors:
                 neighbor = (nx, ny)
-                terrain_cost = grid.get_tile(round(ny), round(nx))
-                if terrain_cost == None: terrain_cost = 0
+                terrain_cost = grid.get_tile(round(ny), round(nx), c.STRUCTURES)
+                if terrain_cost == []: terrain_cost = 0
+                else: terrain_cost = terrain_cost[0]
                 tentative_g = current.g + 1 + terrain_cost
 
                 if neighbor not in g_score or tentative_g < g_score[neighbor]:
