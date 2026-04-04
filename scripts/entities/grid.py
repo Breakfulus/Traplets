@@ -20,6 +20,16 @@ class Grid:
     def get_tile(self, row, col, layer):
         return self.grid[row][col][layer]
     
+    def select_entity_in_tile(self, row, col, layer, mouse_pos=None):
+        tile = self.get_tile(row,col, layer)
+        
+        if not tile:
+            return None
+        
+        if mouse_pos == None:
+            return tile[0]
+
+    
     def add_to_tile(self, row, col, layer, entity):
         tile = self.grid[row][col]
         tile[layer].append(entity)

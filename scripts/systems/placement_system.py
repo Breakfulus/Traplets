@@ -133,7 +133,7 @@ class PlacementSystem:
                     tile_clicked = mouse_pos[0] // c.TILE_SIZE, mouse_pos[1] // c.TILE_SIZE
                     print(f"Tile: {tile_clicked}")
 
-                    tile_id = self.grid.get_tile(tile_clicked[1], tile_clicked[0], c.STRUCTURES)
+                    tile_id = self.grid.select_entity_in_tile(tile_clicked[1], tile_clicked[0], c.STRUCTURES)
                     select_tower_event = pygame.event.Event(SELECTTOWER, eid=tile_id)
                     print(tile_id)
                     pygame.event.post(select_tower_event)
