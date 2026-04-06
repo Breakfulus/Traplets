@@ -1,7 +1,9 @@
 import pygame
+import utils.consts as c
 
 ENEMY_DEFINITIONS = {
     'mushant': {
+        'need': {'type': c.ENEMIES},
         'health_component': {
             'max_health': 200,
             'health': 200
@@ -28,6 +30,7 @@ ENEMY_DEFINITIONS = {
 
 TOWER_DEFINITIONS = {
     'mushant': {
+        'need': {'type': c.STRUCTURES},
         'health_component': {
             'max_health': 200,
             'health': 200
@@ -43,7 +46,7 @@ TOWER_DEFINITIONS = {
             'image_rect': None
         },
         "structure_component":{
-            'footprint': [[1]],
+            'footprint': [[1, 1]],
             'selectable': True,
             'selected': False
         }

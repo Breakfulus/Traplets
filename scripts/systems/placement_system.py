@@ -33,50 +33,52 @@ class PlacementSystem:
                 self.preview_tiles.add((tile_x, tile_y))
                 print(self.preview_tiles)
     
-    def can_place(self, start_row, start_col):
-        self.footprint = self.selected_blueprint['structure_component']['footprint']
+    # def can_place(self, start_row, start_col):
+    #     self.footprint = self.selected_blueprint['structure_component']['footprint']
 
-        for r in range(len(self.footprint)):
-            for c_ in range(len(self.footprint[r])):
+    #     for r in range(len(self.footprint)):
+    #         for c_ in range(len(self.footprint[r])):
 
-                if self.footprint[r][c_] == 0:
-                    continue
+    #             if self.footprint[r][c_] == 0:
+    #                 continue
             
-                grid_row = start_row + r
-                grid_col = start_col + c_
+    #             grid_row = start_row + r
+    #             grid_col = start_col + c_
 
-                if grid_row < 0 or grid_row >= c.GRID_HEIGHT:
-                    return False
-                if grid_col < 0 or grid_col >= c.GRID_WIDTH:
-                    return False
+    #             if grid_row < 0 or grid_row >= c.GRID_HEIGHT:
+    #                 return False
+    #             if grid_col < 0 or grid_col >= c.GRID_WIDTH:
+    #                 return False
                 
-                if not self.grid.is_not_blocked(grid_row, grid_col):
-                    return False
-        return True
+    #             if not self.grid.is_not_blocked(grid_row, grid_col):
+    #                 return False
+    #     return True
 
 
     def place(self, start_row, start_col):
-        if self.selected_blueprint == None:
-            return
-
-        if not self.can_place(start_row, start_col):
-            return
         
         entity_id = Entity.reserve_id()
         
         world_x = start_col * c.TILE_SIZE
         world_y = start_row * c.TILE_SIZE
         place_tower_event = pygame.event.Event(PLACETOWER, pos=(world_x, world_y), blueprint=self.selected_blueprint, team='player', eid=entity_id)
-        pygame.event.post(place_tower_event)
 
-        for r in range(len(self.footprint)):
-            for c_ in range(len(self.footprint[r])):
-                if self.footprint[r][c_] == 0:
-                    continue
+        self.footprint = self.selected_blueprint['structure_component']['footprint']
+        
+        if self.selected_blueprint == None:
+            return
+
+        if self.grid.can_place(start_row, start_col, self.footprint):
+            pygame.event.post(place_tower_event)
+
+        # for r in range(len(self.footprint)):
+        #     for c_ in range(len(self.footprint[r])):
+        #         if self.footprint[r][c_] == 0:
+        #             continue
             
-                grid_row = start_row + r
-                grid_col = start_col + c_
-                self.grid.add_to_tile(grid_row, grid_col, c.STRUCTURES, entity_id)
+        #         grid_row = start_row + r
+        #         grid_col = start_col + c_
+        #         self.grid.add_to_tile(grid_row, grid_col, c.STRUCTURES, entity_id)
     
     def destroy(self, row, col, tile):
         obj = self.grid.get_tile(tile[1], tile[0], c.STRUCTURES)
@@ -84,10 +86,10 @@ class PlacementSystem:
             destroy_tower_event = pygame.event.Event(DESTROYTOWER, eid=obj[0])
             pygame.event.post(destroy_tower_event)
 
-        for r in range(self.grid.grid_height):
-            for c_ in range(self.grid.grid_width):
-                if self.grid.get_tile(r, c_, c.STRUCTURES) == obj:
-                    self.grid.remove_from_tile(r, c_, c.STRUCTURES, obj)
+        # for r in range(self.grid.grid_height):
+        #     for c_ in range(self.grid.grid_width):
+        #         if self.grid.get_tile(r, c_, c.STRUCTURES) == obj:
+        #             self.grid.remove_from_tile(r, c_, c.STRUCTURES, obj)
         
     def finalize_destruction(self):
         for tile in self.preview_tiles:

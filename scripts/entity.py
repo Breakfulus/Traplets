@@ -13,6 +13,7 @@ class Entity:
         self.id = eid
 
         self.position = list(position)
+        self.grid_pos = None
         self.team = team
         self.type = None
         self.alive = True

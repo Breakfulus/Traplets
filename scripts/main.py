@@ -1,6 +1,6 @@
 import pygame
 from systems.entity_manager import EntityManager
-from entities.grid import Grid
+from grid import Grid
 from systems.placement_system import PlacementSystem
 from systems.movement_system import MovementSystem
 from systems.pathfinding_system import PathfindingSystem
@@ -27,7 +27,7 @@ PLACETOWER = pygame.USEREVENT + 1
 DESTROYTOWER = pygame.USEREVENT + 2
 SELECTTOWER = pygame.USEREVENT + 3
 
-manager = EntityManager()
+manager = EntityManager(grid)
 
 mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['mushant'], (0 * c.TILE_SIZE, 0 * c.TILE_SIZE), 'enemy')
 mushant_2 = manager.create_entity(ENEMY_DEFINITIONS['mushant'], (3 * c.TILE_SIZE, 0 * c.TILE_SIZE), 'enemy')
@@ -65,7 +65,7 @@ while running:
             pathfinding_system.update(manager.enemies, grid)
 
         if event.type == DESTROYTOWER:
-            manager.kill_entity(event.eid)
+            manager.kill_entity(event.eid, c.STRUCTURES)
         
         if event.type == SELECTTOWER:
             print(f"Entity {event.eid} selected!")
