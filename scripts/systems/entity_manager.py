@@ -29,7 +29,7 @@ class EntityManager:
         row, col = entity.grid_pos
         print(f"Entity {entity.id} tile pos: {entity.grid_pos}!")
 
-        layer = entity.need['type']
+        layer = entity.need['catagory']
 
         for row, col in tiles:
             self.grid.add_to_tile(row, col, layer, eid)

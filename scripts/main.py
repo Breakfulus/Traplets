@@ -45,9 +45,6 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_F11:
                 pygame.display.toggle_fullscreen()
-
-            if event.key == pygame.K_DELETE or event.key == pygame.K_BACKSPACE:
-                pass
         
             if event.key == pygame.K_c:
                 if c.MODE == 0: c.MODE = 1
@@ -56,7 +53,7 @@ while running:
         place_system.placement_system_events(event)
         
         if event.type == PLACETOWER:
-            manager.create_entity(event.blueprint, event.pos, event.tiles, event.team, event.eid)
+            manager.create_entity(event.blueprint, event.pos, event.tiles, event.team)
 
             for entity in manager.enemies.values():
                 movement = getattr(entity, "movement_component", None)
@@ -81,7 +78,7 @@ while running:
     grid.get_mouse_tile_pos(mouse_pos)
     grid.draw_grid(screen)
 
-    enemy_movement.update(manager.enemies)
+    enemy_movement.update(manager.enemies, grid)
     
     manager.render_entities(screen)
     place_system.draw(screen)
