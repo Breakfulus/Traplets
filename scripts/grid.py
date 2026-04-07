@@ -13,30 +13,12 @@ class Grid:
                     for _ in range(self.grid_height)
                 ]
     
+    #check if tile has a structure
     def is_not_blocked(self, row, col):
         tile = self.grid[row][col]
         return tile[c.STRUCTURES] == []
-    
-    def can_place(self, start_row, start_col, footprint):
 
-        for r in range(len(footprint)):
-            for c_ in range(len(footprint[r])):
-
-                if footprint[r][c_] == 0:
-                    continue
-            
-                grid_row = start_row + r
-                grid_col = start_col + c_
-
-                if grid_row < 0 or grid_row >= c.GRID_HEIGHT:
-                    return False
-                if grid_col < 0 or grid_col >= c.GRID_WIDTH:
-                    return False
-                
-                if not self.is_not_blocked(grid_row, grid_col):
-                    return False
-        return True
-
+    #get all entities from a specific layer on the tile
     def get_tile(self, row, col, layer):
         return self.grid[row][col][layer]
     
@@ -49,7 +31,6 @@ class Grid:
         if mouse_pos == None:
             return tile[0]
 
-    
     def add_to_tile(self, row, col, layer, eid):
         tile = self.grid[row][col]
         tile[layer].append(eid)
@@ -65,7 +46,6 @@ class Grid:
         return row, col
 
     def draw_grid(self, screen):
-    #Draw grid
         for row in range(self.grid_height):
             for col in range(self.grid_width):
                 rect = pygame.Rect(col * self.tile_size, row * self.tile_size, self.tile_size, self.tile_size)

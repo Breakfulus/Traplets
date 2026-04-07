@@ -29,8 +29,8 @@ SELECTTOWER = pygame.USEREVENT + 3
 
 manager = EntityManager(grid)
 
-mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['mushant'], (0 * c.TILE_SIZE, 0 * c.TILE_SIZE), 'enemy')
-mushant_2 = manager.create_entity(ENEMY_DEFINITIONS['mushant'], (3 * c.TILE_SIZE, 0 * c.TILE_SIZE), 'enemy')
+mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['mushant'], (0 * c.TILE_SIZE, 0 * c.TILE_SIZE), [(0 * c.TILE_SIZE, 0 * c.TILE_SIZE)], 'enemy')
+mushant_2 = manager.create_entity(ENEMY_DEFINITIONS['mushant'], (3 * c.TILE_SIZE, 0 * c.TILE_SIZE), [(0 * c.TILE_SIZE, 0 * c.TILE_SIZE)], 'enemy')
 enemy_movement = MovementSystem()
 
 running = True
@@ -56,7 +56,7 @@ while running:
         place_system.placement_system_events(event)
         
         if event.type == PLACETOWER:
-            manager.create_entity(event.blueprint, event.pos, event.team, event.eid)
+            manager.create_entity(event.blueprint, event.pos, event.tiles, event.team, event.eid)
 
             for entity in manager.enemies.values():
                 movement = getattr(entity, "movement_component", None)

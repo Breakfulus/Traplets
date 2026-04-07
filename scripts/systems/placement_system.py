@@ -28,68 +28,30 @@ class PlacementSystem:
         mouse_pos = self.mouse_position()
         #drag selecting
         if self.dragging:
-            tile_x, tile_y = mouse_pos[0] // c.TILE_SIZE, mouse_pos[1] // c.TILE_SIZE
-            if 0 <= tile_x < c.GRID_WIDTH and 0 <= tile_y < c.GRID_HEIGHT:
-                self.preview_tiles.add((tile_x, tile_y))
+            col, row = mouse_pos[0] // c.TILE_SIZE, mouse_pos[1] // c.TILE_SIZE
+            if 0 <= col < c.GRID_WIDTH and 0 <= row < c.GRID_HEIGHT:
+                self.preview_tiles.add((col, row))
                 print(self.preview_tiles)
-    
-    # def can_place(self, start_row, start_col):
-    #     self.footprint = self.selected_blueprint['structure_component']['footprint']
 
-    #     for r in range(len(self.footprint)):
-    #         for c_ in range(len(self.footprint[r])):
-
-    #             if self.footprint[r][c_] == 0:
-    #                 continue
-            
-    #             grid_row = start_row + r
-    #             grid_col = start_col + c_
-
-    #             if grid_row < 0 or grid_row >= c.GRID_HEIGHT:
-    #                 return False
-    #             if grid_col < 0 or grid_col >= c.GRID_WIDTH:
-    #                 return False
-                
-    #             if not self.grid.is_not_blocked(grid_row, grid_col):
-    #                 return False
-    #     return True
-
-
-    def place(self, start_row, start_col):
+    def place(self, start_row, start_col, tiles):
         
         entity_id = Entity.reserve_id()
         
         world_x = start_col * c.TILE_SIZE
         world_y = start_row * c.TILE_SIZE
-        place_tower_event = pygame.event.Event(PLACETOWER, pos=(world_x, world_y), blueprint=self.selected_blueprint, team='player', eid=entity_id)
-
-        self.footprint = self.selected_blueprint['structure_component']['footprint']
+        
+        place_tower_event = pygame.event.Event(PLACETOWER, pos=(world_x, world_y), tiles=tiles, blueprint=self.selected_blueprint, team='player', eid=entity_id)
         
         if self.selected_blueprint == None:
             return
-
-        if self.grid.can_place(start_row, start_col, self.footprint):
-            pygame.event.post(place_tower_event)
-
-        # for r in range(len(self.footprint)):
-        #     for c_ in range(len(self.footprint[r])):
-        #         if self.footprint[r][c_] == 0:
-        #             continue
-            
-        #         grid_row = start_row + r
-        #         grid_col = start_col + c_
-        #         self.grid.add_to_tile(grid_row, grid_col, c.STRUCTURES, entity_id)
+        
+        pygame.event.post(place_tower_event)
     
     def destroy(self, row, col, tile):
         obj = self.grid.get_tile(tile[1], tile[0], c.STRUCTURES)
         if obj and obj != None:
             destroy_tower_event = pygame.event.Event(DESTROYTOWER, eid=obj[0])
             pygame.event.post(destroy_tower_event)
-
-        # for r in range(self.grid.grid_height):
-        #     for c_ in range(self.grid.grid_width):
-        #         if self.grid.get_tile(r, c_, c.STRUCTURES) == obj:
-        #             self.grid.remove_from_tile(r, c_, c.STRUCTURES, obj)
         
     def finalize_destruction(self):
         for tile in self.preview_tiles:
@@ -100,11 +62,73 @@ class PlacementSystem:
         self.dragging = False
         
     def finalize_placement(self):
-        for tile in self.preview_tiles:
-            self.place(tile[1], tile[0])
+        reserved = set()
+        for tile in sorted(self.preview_tiles, key=lambda t: (t[1], t[0])):
+            footprint = self.selected_blueprint['structure_component']['footprint']
+            tiles = []
+            
+            #build the footprint
+            for r in range(len(footprint)):
+                for c_ in range(len(footprint[r])):
+                    if footprint[r][c_] == 0:
+                        continue
+                
+                    grid_row = tile[1] + r
+                    grid_col = tile[0] + c_
+                    tiles.append((grid_row, grid_col))
+
+            can_place = True
+            for row, col in tiles:
+                if not self.grid.is_not_blocked(row, col) or (row, col) in reserved:
+                    can_place = False
+                    break
+            
+            if not can_place:
+                continue
+            
+            #reserve tile going to be occupied before placing
+            for t in tiles:
+                reserved.add(t)
+
+            self.place(tile[1], tile[0], tiles)
+
         print(self.grid.grid)
         self.preview_tiles.clear()
         self.dragging = False
+
+    # def finalize_placement(self):
+    #     reserved = set()
+
+    #     for tile in sorted(self.preview_tiles, key=lambda t: (t[1], t[0])):
+    #         start_row, start_col = tile[1], tile[0]
+
+    #         # build footprint tiles
+    #         footprint_tiles = []
+    #         for r in range(len(self.selected_blueprint['structure_component']['footprint'])):
+    #             for c_ in range(len(self.selected_blueprint['structure_component']['footprint'][r])):
+    #                 if self.selected_blueprint['structure_component']['footprint'][r][c_] == 0:
+    #                     continue
+    #                 footprint_tiles.append((start_row + r, start_col + c_))
+
+    #         # 🔥 CHECK BOTH GRID + RESERVED
+    #         can_place = True
+    #         for row, col in footprint_tiles:
+    #             if not self.grid.is_not_blocked(row, col) or (row, col) in reserved:
+    #                 can_place = False
+    #                 break
+
+    #         if not can_place:
+    #             continue
+
+    #         # reserve tiles FIRST
+    #         for t in footprint_tiles:
+    #             reserved.add(t)
+
+    #         # then place (which updates grid)
+    #         self.place(start_row, start_col, footprint_tiles)
+
+    #     self.preview_tiles.clear()
+    #     self.dragging = False
 
     def draw_selection(self, surf):
         for tile in self.preview_tiles:
@@ -149,7 +173,7 @@ class PlacementSystem:
                 #If not building and dragging right click quick destroy
                 elif c.MODE == 1:
                     self.preview_tiles.clear()
-                    self.dragging = True     
+                    self.dragging = True
         
         if event.type == pygame.MOUSEBUTTONUP:
             if c.MODE == 0:

@@ -46,7 +46,7 @@ TOWER_DEFINITIONS = {
             'image_rect': None
         },
         "structure_component":{
-            'footprint': [[1, 1]],
+            'footprint': [[1]],
             'selectable': True,
             'selected': False
         }

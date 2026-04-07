@@ -9,15 +9,19 @@ class EntityManager:
         self.enemies = {}
         self.grid = grid
 
-    def create_entity(self, blueprint, pos, team, eid=None):
+    def create_entity(self, blueprint, pos, tiles, team, eid=None):
+        
+        #only reserve and ID if entity isn't already given one before creation
         if eid == None:
             eid = Entity.reserve_id()
         
-        entity = Entity(pos, team, eid) #{'pos': pos, 'team': team, 'eid': eid}
+        entity = Entity(pos, team, eid)
+        
         for comp_name, comp_stats in blueprint.items():
             setattr(entity, comp_name, comp_stats.copy())
 
         self.entities[eid] = entity
+
         if hasattr(entity, "movement_component"):
             self.enemies[eid] = entity
 
@@ -27,7 +31,8 @@ class EntityManager:
 
         layer = entity.need['type']
 
-        self.grid.add_to_tile(row, col, layer, eid)
+        for row, col in tiles:
+            self.grid.add_to_tile(row, col, layer, eid)
 
         self.load_entity_images(entity)
         print(f"Entity {entity.id} has been created!")
