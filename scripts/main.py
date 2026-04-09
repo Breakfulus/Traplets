@@ -29,9 +29,11 @@ SELECTTOWER = pygame.USEREVENT + 3
 
 manager = EntityManager(grid)
 
-mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['mushant'], (0 * c.TILE_SIZE, 0 * c.TILE_SIZE), [(0 * c.TILE_SIZE, 0 * c.TILE_SIZE)], 'enemy')
-mushant_2 = manager.create_entity(ENEMY_DEFINITIONS['mushant'], (3 * c.TILE_SIZE, 0 * c.TILE_SIZE), [(0 * c.TILE_SIZE, 0 * c.TILE_SIZE)], 'enemy')
+mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['mushant'], (0 * c.TILE_SIZE, 0 * c.TILE_SIZE), [(0, 0)], 'enemy')
+mushant_1 = manager.create_entity(TOWER_DEFINITIONS['base'], (4 * c.TILE_SIZE, 4 * c.TILE_SIZE), [(4, 4)], 'player')
 enemy_movement = MovementSystem()
+
+pathfinding_system.update(manager.enemies, manager.entities, grid)
 
 running = True
 while running:
@@ -54,12 +56,7 @@ while running:
         
         if event.type == PLACETOWER:
             manager.create_entity(event.blueprint, event.pos, event.tiles, event.team)
-
-            for entity in manager.enemies.values():
-                movement = getattr(entity, "movement_component", None)
-                movement['goal'] = event.pos
-                movement['needs_path'] = True
-            pathfinding_system.update(manager.enemies, grid)
+            pathfinding_system.update(manager.enemies, manager.entities, grid)
 
         if event.type == DESTROYTOWER:
             manager.kill_entity(event.eid, c.STRUCTURES)
@@ -68,21 +65,24 @@ while running:
             print(f"Entity {event.eid} selected!")
             manager.select_entity(event.eid)
     
+    #Add selected tiles during building to selection
     place_system.building_selection()
-    #Draw section
+    
+    #Make enemies move
+    enemy_movement.update(manager.enemies, grid, screen)
+    
+    grid.update()
+
+    #---Draw section
     screen.fill('darkslateblue')
 
-    #draw mouse indicator and get mouse position
-    place_system.mouse_position()
-    
-    grid.get_mouse_tile_pos(mouse_pos)
     grid.draw_grid(screen)
 
-    enemy_movement.update(manager.enemies, grid)
-    
     manager.render_entities(screen)
+
     place_system.draw(screen)
-    
+
+    #Delete all entities who have a false alive flag at the end of a frame
     manager.entity_clean_up()
     pygame.display.flip()
     clock.tick(60)

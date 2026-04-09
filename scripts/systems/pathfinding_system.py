@@ -128,7 +128,23 @@ class PathfindingSystem:
         movement['needs_path'] = False
         print("path generated!")
     
-    def update(self, entities, grid):
+    def get_new_goal(self, entities, preference):
+        for entity in entities.values():
+            structure = getattr(entity, "structure_component", None)
+
+            if not structure:
+                continue
+
+            if not entity.need["type"] == preference:
+                print(f"Entity {entity.id} is not a {preference}!")
+                continue
+
+            return entity.position
+                
+
+
+
+    def update(self, entities, structures, grid):
             for entity in entities.values():
                 movement = getattr(entity, "movement_component", None)
 
@@ -139,6 +155,10 @@ class PathfindingSystem:
                 if not movement["needs_path"]:
                     print(f"Entity {entity.id} cant have a path!")
                     continue
+
+                movement = getattr(entity, "movement_component", None)
+                movement['goal'] = self.get_new_goal(structures, entity.movement_component["prefered_target"])
+                movement['needs_path'] = True
                 
                 self.generate_path(entity, movement, grid)
 

@@ -32,17 +32,20 @@ class Grid:
             return tile[0]
 
     def add_to_tile(self, row, col, layer, eid):
-        tile = self.grid[row][col]
+        tile = self.grid[int(row)][int(col)]
         tile[layer].append(eid)
     
     def remove_from_tile(self, row, col, layer, eid):
         for eid in self.grid[row][col][layer]:
             self.grid[row][col][layer].remove(eid)
     
-    def get_mouse_tile_pos(self, pos):
-        col = pos[0] // self.tile_size
-        row = pos[1] // self.tile_size
-        self.hovered_tile = (col * self.tile_size, row * self.tile_size)
+    def get_mouse_tile_pos(self):
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        col = mouse_x // c.TILE_SIZE
+        row = mouse_y // c.TILE_SIZE
+        cell_x = col * c.TILE_SIZE
+        cell_y = row * c.TILE_SIZE
+        self.hovered_tile = (cell_x, cell_y)
         return row, col
 
     def draw_grid(self, screen):
@@ -62,5 +65,8 @@ class Grid:
                 
                 pygame.draw.rect(screen, color, rect)
                 pygame.draw.rect(screen, (20, 20, 20), rect, 1)
+    
+    def update(self):
+        self.get_mouse_tile_pos()
 
         

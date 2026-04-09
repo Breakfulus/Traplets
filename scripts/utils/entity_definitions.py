@@ -57,7 +57,7 @@ TOWER_DEFINITIONS = {
             'selected': False
         }
     },
-        'base': {
+    'base': {
         'need': {
             'type': 'base',
             'catagory': c.STRUCTURES
