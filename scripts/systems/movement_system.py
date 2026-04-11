@@ -17,8 +17,8 @@ class MovementSystem:
             grid.add_to_tile(new_col, new_row, c.ENEMIES, entity.id)
 
         entity.grid_pos = (new_col, new_row)
-        print(grid.get_tile(new_col, new_row, c.ENEMIES))
-        print(f"Entity {entity.id} moved to {entity.grid_pos}!")
+        # print(grid.get_tile(new_col, new_row, c.ENEMIES))
+        # print(f"Entity {entity.id} moved to {entity.grid_pos}!")
 
 
     def move_towards_target(self, entity, movement):
@@ -46,6 +46,7 @@ class MovementSystem:
                     movement['goal'] = None
                     movement['needs_path'] = True
                 return
+            
             #move on x axis before y axis
             if distance != 0:
                 dx /= distance
@@ -58,6 +59,13 @@ class MovementSystem:
         for entity in entities.values():
             movement = getattr(entity, "movement_component", None) #get the targets movement component
             self.move_towards_target(entity, movement)
+
+            if not movement["path"] or movement["path"] == None:
+                continue
+
+            if movement["path_dirty"]:
+                continue
+            
             if not movement['needs_path']:
                 debug_path = []
                 for (x, y) in entity.movement_component["path"]:

@@ -30,7 +30,7 @@ SELECTTOWER = pygame.USEREVENT + 3
 manager = EntityManager(grid)
 
 mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['mushant'], (0 * c.TILE_SIZE, 0 * c.TILE_SIZE), [(0, 0)], 'enemy')
-mushant_1 = manager.create_entity(TOWER_DEFINITIONS['base'], (4 * c.TILE_SIZE, 4 * c.TILE_SIZE), [(4, 4)], 'player')
+base = manager.create_entity(TOWER_DEFINITIONS['base'], (4 * c.TILE_SIZE, 4 * c.TILE_SIZE), [(4, 4)], 'player')
 enemy_movement = MovementSystem()
 
 pathfinding_system.update(manager.enemies, manager.entities, grid)
@@ -56,7 +56,7 @@ while running:
         
         if event.type == PLACETOWER:
             manager.create_entity(event.blueprint, event.pos, event.tiles, event.team)
-            pathfinding_system.update(manager.enemies, manager.entities, grid)
+            
 
         if event.type == DESTROYTOWER:
             manager.kill_entity(event.eid, c.STRUCTURES)
@@ -69,6 +69,7 @@ while running:
     place_system.building_selection()
     
     #Make enemies move
+    pathfinding_system.update(manager.enemies, manager.entities, grid)
     enemy_movement.update(manager.enemies, grid, screen)
     
     grid.update()

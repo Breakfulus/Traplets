@@ -20,8 +20,9 @@ ENEMY_DEFINITIONS = {
             'path': [],
             'target_index': 0,
             'needs_path': True,
+            'path_dirty': False,
             'goal': None,
-            'prefered_target': 'base'
+            'prefered_target': 'tower'
         },
         "rendering_component":{
             'image path': "red_cube.png",
