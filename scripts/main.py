@@ -56,7 +56,6 @@ while running:
         
         if event.type == PLACETOWER:
             manager.create_entity(event.blueprint, event.pos, event.tiles, event.team)
-            
 
         if event.type == DESTROYTOWER:
             manager.kill_entity(event.eid, c.STRUCTURES)

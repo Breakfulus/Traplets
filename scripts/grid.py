@@ -18,6 +18,10 @@ class Grid:
         tile = self.grid[row][col]
         return tile[c.STRUCTURES] == []
 
+    def has_no_enemy(self, row, col):
+        tile = self.grid[row][col]
+        return tile[c.ENEMIES] == []
+
     #get all entities from a specific layer on the tile
     def get_tile(self, row, col, layer):
         return self.grid[row][col][layer]
@@ -53,12 +57,12 @@ class Grid:
             for col in range(self.grid_width):
                 rect = pygame.Rect(col * self.tile_size, row * self.tile_size, self.tile_size, self.tile_size)
                 if rect.collidepoint(self.hovered_tile[0], self.hovered_tile[1]):
-                    if self.is_not_blocked(row, col):
+                    if self.is_not_blocked(row, col) and self.has_no_enemy(row, col):
                         color = (0, 100, 200)
                     else:
                         color = (200, 100, 0)
                 else:
-                    if self.is_not_blocked(row, col):
+                    if self.is_not_blocked(row, col) and self.has_no_enemy(row, col):
                         color = (80, 80, 80)
                     else:
                         color = (50, 50, 50)

@@ -67,6 +67,11 @@ TOWER_DEFINITIONS = {
             'max_health': 200,
             'health': 200
         },
+        'combat_component': {
+            'range': 0,
+            'attack_speed': 0,
+            'damage': 0
+        },
         "rendering_component":{
             'image path': "purple_cube.png",
             'image': None,

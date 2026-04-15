@@ -79,13 +79,20 @@ class PlacementSystem:
 
             can_place = True
 
-
             for row, col in tiles:
                 if col not in range(c.GRID_WIDTH) or row not in range(c.GRID_HEIGHT):
                     can_place = False
                     break
 
-                if not self.grid.is_not_blocked(row, col) or (row, col) in reserved:
+                if not self.grid.is_not_blocked(row, col):
+                    can_place = False
+                    break
+
+                if (row, col) in reserved:
+                    can_place = False
+                    break
+
+                if not self.grid.has_no_enemy(row, col):
                     can_place = False
                     break
 
@@ -97,6 +104,7 @@ class PlacementSystem:
                 reserved.add(t)
 
             self.place(tile[1], tile[0], tiles)
+            print(self.grid.grid)
 
         print(self.grid.grid)
         self.preview_tiles.clear()
