@@ -13,9 +13,9 @@ class MovementSystem:
             old_col, old_row = entity.grid_pos
 
             entity_id = entity.id
-
-            grid.remove_from_tile(old_col, old_row, c.ENEMIES, entity_id)
+            
             grid.add_to_tile(new_row, new_col, c.ENEMIES, entity.id)
+            grid.remove_from_tile(old_col, old_row, c.ENEMIES, entity_id)
 
         entity.grid_pos = (new_row, new_col)
         # print(grid.get_tile(new_row, new_col, c.ENEMIES))

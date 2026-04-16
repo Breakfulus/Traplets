@@ -136,7 +136,6 @@ class PathfindingSystem:
             entity.movement_component["path"] = []
             entity.movement_component["target"] = 0
             
-
         movement['needs_path'] = False
         print("path generated!")
     

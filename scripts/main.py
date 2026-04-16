@@ -14,8 +14,6 @@ pygame.display.set_caption("Traplet Tower Defense")
 
 clock = pygame.time.Clock()
 
-path = []
-
 grid = Grid(c.GRID_HEIGHT, c.GRID_WIDTH, c.TILE_SIZE)
 
 preview_tiles = set()
@@ -49,7 +47,7 @@ while running:
                 pygame.display.toggle_fullscreen()
         
             if event.key == pygame.K_c:
-                if c.MODE == 0: c.MODE = 1
+                if c.MODE == 0: c.MODE = 1 
                 else: c.MODE = 0
 
         place_system.placement_system_events(event)
