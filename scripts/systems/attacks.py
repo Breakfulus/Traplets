@@ -1,13 +1,7 @@
 import pygame
 
-class AttackStrategy():
-    def __init__(self):
-        pass
+def single_shot():
+    pass
 
-class SingleShot(AttackStrategy):
-    def __init__(self):
-        super().__init__()
-
-class AreaAttack(AttackStrategy):
-    def __init__(self):
-        super().__init__()
+def area_attack():
+    pass

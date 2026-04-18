@@ -147,7 +147,7 @@ class PathfindingSystem:
                 continue
 
             if not entity.need["type"] == preference:
-                print(f"Entity {entity.id} is not a {preference}!")
+                # print(f"Entity {entity.id} is not a {preference}!")
                 continue
 
             return entity.position

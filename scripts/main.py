@@ -4,6 +4,7 @@ from grid import Grid
 from systems.placement_system import PlacementSystem
 from systems.movement_system import MovementSystem
 from systems.pathfinding_system import PathfindingSystem
+from systems.combat_system import CombatSystem
 from utils.entity_definitions import ENEMY_DEFINITIONS, TOWER_DEFINITIONS
 import utils.consts as c
 
@@ -27,11 +28,14 @@ SELECTTOWER = pygame.USEREVENT + 3
 
 manager = EntityManager(grid)
 
+combat_system = CombatSystem(manager)
+
 mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['mushant'], (0 * c.TILE_SIZE, 0 * c.TILE_SIZE), [(0, 0)], 'enemy')
 base = manager.create_entity(TOWER_DEFINITIONS['base'], (4 * c.TILE_SIZE, 4 * c.TILE_SIZE), [(4, 4)], 'player')
 enemy_movement = MovementSystem()
 
 pathfinding_system.update(manager.enemies, manager.entities, grid)
+
 
 running = True
 while running:
@@ -79,6 +83,8 @@ while running:
     manager.render_entities(screen)
 
     place_system.draw(screen)
+
+    combat_system.update(grid, manager.towers, screen)
 
     #Delete all entities who have a false alive flag at the end of a frame
     manager.entity_clean_up()

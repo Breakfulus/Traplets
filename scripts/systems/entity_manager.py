@@ -7,6 +7,7 @@ class EntityManager:
     def __init__(self, grid):
         self.entities = {}
         self.enemies = {}
+        self.towers = {}
         self.grid = grid
 
     def create_entity(self, blueprint, pos, tiles, team, eid=None):
@@ -22,8 +23,11 @@ class EntityManager:
 
         self.entities[eid] = entity
 
-        if hasattr(entity, "movement_component"):
+        if entity.need['type'] == 'enemy':
             self.enemies[eid] = entity
+        
+        if entity.need['type'] == 'tower':
+            self.towers[eid] = entity
 
         entity.grid_pos = [entity.position[1] // c.TILE_SIZE, entity.position[0] // c.TILE_SIZE]
         row, col = entity.grid_pos

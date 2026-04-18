@@ -4,6 +4,7 @@ import utils.consts as c
 ENEMY_DEFINITIONS = {
     'mushant': {
         'need': {
+            'type': 'enemy',
             'catagory': c.ENEMIES
         },
         'health_component': {
@@ -43,7 +44,7 @@ TOWER_DEFINITIONS = {
             'health': 200
         },
         'combat_component': {
-            'range': 2,
+            'range': 4,
             'attack_speed': 2,
             'damage': 5
         },
