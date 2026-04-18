@@ -64,8 +64,8 @@ class PathfindingSystem:
                         if grid.is_not_blocked(row, col):
 
                             # convert tile → pixel center
-                            tile_x = col * c.TILE_SIZE + c.TILE_SIZE // 2
-                            tile_y = row * c.TILE_SIZE + c.TILE_SIZE // 2
+                            tile_x = row * c.TILE_SIZE + c.TILE_SIZE // 2
+                            tile_y = col * c.TILE_SIZE + c.TILE_SIZE // 2
 
                             dx = tile_x - entity.position[0]
                             dy = tile_y - entity.position[1]
@@ -75,7 +75,7 @@ class PathfindingSystem:
                             if distance < best_distance:
                                 best_distance = distance
                                 best_tile = (row, col)
-                                print(best_tile)
+                                # print(best_tile)
 
                 goal_tile = best_tile
 
@@ -123,7 +123,7 @@ class PathfindingSystem:
             return None
 
         goal_tile = (goal_tile[1] // c.TILE_SIZE, goal_tile[0] // c.TILE_SIZE)
-        print(goal_tile)
+        # print(goal_tile)
         start_tile = (int(entity.position[1] // c.TILE_SIZE), int(entity.position[0] // c.TILE_SIZE))
 
         path_tiles = self.a_star_algorithm(grid, start_tile, goal_tile, entity)

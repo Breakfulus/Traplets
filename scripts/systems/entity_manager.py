@@ -66,7 +66,7 @@ class EntityManager:
             entity.rendering_component['image'] = entity_image
     
     def render_entities(self, screen):
-        sorted_entities = sorted(self.entities.values(), key=lambda x: x.position[1])
+        sorted_entities = sorted(self.entities.values(), key=lambda y: y.position[1])
         for entity in sorted_entities:
             if entity.rendering_component and entity.rendering_component['image'] != None:
                 entity_image = entity.rendering_component['image']
@@ -76,13 +76,24 @@ class EntityManager:
                 screen.blit(entity_image, rect)
         
         for entity in sorted_entities:
-            if hasattr(entity, 'structure_component') and entity.structure_component['selectable']:
-                if entity.structure_component.get('selected'):
-                    pygame.draw.circle(screen, 'red', entity.rendering_component.get('image_rect').center, entity.combat_component['range'] * c.TILE_SIZE, 5)
-            
+            if hasattr(entity, 'structure_component'):
+                if hasattr(entity, 'combat_component'):
 
-            if not entity.rendering_component['image']:
-                print(f"Entity {entity.id} has no image?!?")
+                    if entity.structure_component['selectable']:
+
+                        if entity.structure_component.get('selected'):
+                            pygame.draw.circle(screen, 'red', entity.rendering_component.get('image_rect').center, entity.combat_component['range'] * c.TILE_SIZE, 5)
+
+                    if not entity.combat_component.get('targets'):
+                        print("No target!")
+                        continue
+
+                    for target in entity.combat_component.get('targets'):
+                            tower_pos = entity.position[0] + c.TILE_SIZE // 2, entity.position[1] + c.TILE_SIZE // 2
+                            targ_pos = target.position[0] + c.TILE_SIZE // 2, target.position[1] + c.TILE_SIZE // 2
+                            pygame.draw.line(screen, 'green', tower_pos, targ_pos, 5)
+                    if not entity.rendering_component['image']:
+                        print(f"Entity {entity.id} has no image!")
     
     def select_entity(self, eid):
         for entity_id, entity in self.entities.items():

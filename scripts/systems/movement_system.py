@@ -6,20 +6,21 @@ class MovementSystem:
         pass 
     
     def update_entity_grid_pos(self, grid, entity):
-        new_col = round(entity.position[0] // c.TILE_SIZE)
-        new_row = round(entity.position[1] // c.TILE_SIZE)
+        new_col = int(entity.position[0] // c.TILE_SIZE)
+        new_row = int(entity.position[1] // c.TILE_SIZE)
         if (new_row, new_col) != entity.grid_pos:
 
-            old_col, old_row = entity.grid_pos
+            old_row, old_col = entity.grid_pos
 
             entity_id = entity.id
             
             grid.add_to_tile(new_row, new_col, c.ENEMIES, entity.id)
-            grid.remove_from_tile(old_col, old_row, c.ENEMIES, entity_id)
+            grid.remove_from_tile(old_row, old_col, c.ENEMIES, entity_id)
 
         entity.grid_pos = (new_row, new_col)
-        # print(grid.get_tile(new_row, new_col, c.ENEMIES))
-        # print(f"Entity {entity.id} moved to {entity.grid_pos}!")
+        print("Enemy actual tile:",
+            int(entity.position[1] // c.TILE_SIZE),
+            int(entity.position[0] // c.TILE_SIZE))
 
 
     def move_towards_target(self, entity, movement):

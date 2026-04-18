@@ -104,9 +104,9 @@ class PlacementSystem:
                 reserved.add(t)
 
             self.place(tile[1], tile[0], tiles)
-            print(self.grid.grid)
+            # print(self.grid.grid)
 
-        print(self.grid.grid)
+        # print(self.grid.grid)
         self.preview_tiles.clear()
         self.dragging = False
 

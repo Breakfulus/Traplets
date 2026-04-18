@@ -15,25 +15,26 @@ class CombatSystem:
                 if row < 0 or col < 0 or row >= c.GRID_HEIGHT or col >= c.GRID_WIDTH:
                     continue
                 
-                #calculate distance
-                dx = col - center_row
+                dx = col - center_col
                 dy = row - center_row
 
-                #check if tile is in range then add it to tiles
                 if dx*dx + dy*dy <= radius_sq:
                     tiles.append((row, col))
-
+        print("Tower tiles checked:", tiles)
         return tiles
     
-    def get_entities_in_range(self, grid, row, col, radius):
+    def get_entities_in_range(self, grid, row, col, radius, entity):
         tiles = self.get_tiles_in_range(row, col, radius)
         ids = []
 
         for r, c_ in tiles:
             ids.extend(grid.get_tile(r, c_, c.ENEMIES))
+
+        print("IDS:", ids)
         
         targets = [self.manager.entities[eid] for eid in ids]
         
+        print("TARGETS:", targets)
         return targets
 
     def filter_by_exact_range(self, entity, targets, radius):
@@ -44,22 +45,21 @@ class CombatSystem:
             dx = target.position[0] - entity.position[0]
             dy = target.position[1] - entity.position[1]
 
-            if dx*dx + dy*dy <= radius*radius:
+            print("DISTANCES:", [(dx*dx + dy*dy, "vs", radius_sq)])
+
+            if dx*dx + dy*dy <= radius_sq:
                 result.append(target)
-        
+
+        print("LOS RESULT:", result)
         return result
     
-    def update(self, grid, towers, screen):
+    def update(self, grid, towers):
         for eid, tower in towers.items():
-            print(tower)
-            col, row = tower.grid_pos
+            print("TOWER:", tower.id)
+            print("TILE:", tower.grid_pos)
+            row, col = tower.grid_pos
             range_pixels = tower.combat_component['range'] * c.TILE_SIZE
 
-            candidates = self.get_entities_in_range(grid, row, col, tower.combat_component['range'])
+            candidates = self.get_entities_in_range(grid, row, col, tower.combat_component['range'], tower)
 
-            targets = self.filter_by_exact_range(tower, candidates, range_pixels)
-            
-            for t in targets:
-                tower_pos = tower.position[0] + c.TILE_SIZE // 2, tower.position[1] + c.TILE_SIZE // 2
-                targ_pos = t.position[0] + c.TILE_SIZE // 2, t.position[1] + c.TILE_SIZE // 2
-                pygame.draw.line(screen, 'green', tower_pos, targ_pos, 5)
+            tower.combat_component['targets'] = self.filter_by_exact_range(tower, candidates, range_pixels)

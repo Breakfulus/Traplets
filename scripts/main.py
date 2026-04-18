@@ -72,6 +72,7 @@ while running:
     #Make enemies move
     pathfinding_system.update(manager.enemies, manager.entities, grid)
     enemy_movement.update(manager.enemies, grid, screen)
+    combat_system.update(grid, manager.towers)
     
     grid.update()
 
@@ -83,8 +84,6 @@ while running:
     manager.render_entities(screen)
 
     place_system.draw(screen)
-
-    combat_system.update(grid, manager.towers, screen)
 
     #Delete all entities who have a false alive flag at the end of a frame
     manager.entity_clean_up()

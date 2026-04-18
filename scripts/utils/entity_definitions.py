@@ -46,7 +46,9 @@ TOWER_DEFINITIONS = {
         'combat_component': {
             'range': 4,
             'attack_speed': 2,
-            'damage': 5
+            'damage': 5,
+            'targets': [],
+            'target_priority': 'first'
         },
         "rendering_component":{
             'image path': "yellow_cube.png",
