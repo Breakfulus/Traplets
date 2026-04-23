@@ -5,7 +5,7 @@ from systems.placement_system import PlacementSystem
 from systems.movement_system import MovementSystem
 from systems.pathfinding_system import PathfindingSystem
 from systems.combat_system import CombatSystem
-from utils.entity_definitions import ENEMY_DEFINITIONS, TOWER_DEFINITIONS
+from utils.entity_definitions import *
 import utils.consts as c
 
 pygame.init()
@@ -72,7 +72,7 @@ while running:
     #Make enemies move
     pathfinding_system.update(manager.enemies, manager.entities, grid)
     enemy_movement.update(manager.enemies, grid, screen)
-    combat_system.update(grid, manager.towers)
+    combat_system.update(grid, manager.towers.values())
     
     grid.update()
 

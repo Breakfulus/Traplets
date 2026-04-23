@@ -5,16 +5,19 @@ ENEMY_DEFINITIONS = {
     'mushant': {
         'need': {
             'type': 'enemy',
-            'catagory': c.ENEMIES
+            'layer': c.ENEMIES
         },
         'health_component': {
             'max_health': 200,
             'health': 200
         },
         'combat_component': {
-            'range': 2,
-            'attack_speed': 2,
-            'damage': 5
+            'type': 'single_shot',
+            'range': 4,
+            'cooldown': 2,
+            'damage': 5,
+            'targets': [],
+            'target_priority': 'first'
         },
         'movement_component': {
             'speed': 3,
@@ -37,18 +40,20 @@ TOWER_DEFINITIONS = {
     'mushant': {
         'need': {
             'type': 'tower',
-            'catagory': c.STRUCTURES
+            'layer': c.STRUCTURES
         },
         'health_component': {
             'max_health': 200,
             'health': 200
         },
         'combat_component': {
+            'type': 'single_shot',
             'range': 4,
-            'attack_speed': 2,
+            'cooldown': 2,
             'damage': 5,
             'targets': [],
-            'target_priority': 'first'
+            'target_priority': 'first',
+            'last_shot': 0
         },
         "rendering_component":{
             'image path': "yellow_cube.png",
@@ -64,7 +69,7 @@ TOWER_DEFINITIONS = {
     'base': {
         'need': {
             'type': 'base',
-            'catagory': c.STRUCTURES
+            'layer': c.STRUCTURES
         },
         'health_component': {
             'max_health': 200,
@@ -72,7 +77,7 @@ TOWER_DEFINITIONS = {
         },
         'combat_component': {
             'range': 0,
-            'attack_speed': 0,
+            'cooldown': 0,
             'damage': 0
         },
         "rendering_component":{
@@ -84,6 +89,21 @@ TOWER_DEFINITIONS = {
             'footprint': [[1]],
             'selectable': True,
             'selected': False
+        }
+    },
+}
+
+PROJECTILE_DEFINITIONS = {
+    'basic': {
+        'need': {
+            'type': 'projectile',
+            'layer': c.PROJECTILES
+        },
+
+        "rendering_component":{
+            'image path': "placeholder_player_projectile.png",
+            'image': None,
+            'image_rect': None
         }
     },
 }

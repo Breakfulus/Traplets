@@ -8,6 +8,7 @@ class EntityManager:
         self.entities = {}
         self.enemies = {}
         self.towers = {}
+        self.projectiles = {}
         self.grid = grid
 
     def create_entity(self, blueprint, pos, tiles, team, eid=None):
@@ -29,11 +30,14 @@ class EntityManager:
         if entity.need['type'] == 'tower':
             self.towers[eid] = entity
 
+        if entity.need['type'] == 'projectile':
+            self.projectiles[eid] = entity
+
         entity.grid_pos = [entity.position[1] // c.TILE_SIZE, entity.position[0] // c.TILE_SIZE]
         row, col = entity.grid_pos
         print(f"Entity {entity.id} tile pos: {entity.grid_pos}!")
 
-        layer = entity.need['catagory']
+        layer = entity.need['layer']
 
         for row, col in tiles:
             self.grid.add_to_tile(row, col, layer, eid)
@@ -88,7 +92,7 @@ class EntityManager:
                         print("No target!")
                         continue
 
-                    for target in entity.combat_component.get('targets'):
+                    for target in entity.combat_component['targets']:
                             tower_pos = entity.position[0] + c.TILE_SIZE // 2, entity.position[1] + c.TILE_SIZE // 2
                             targ_pos = target.position[0] + c.TILE_SIZE // 2, target.position[1] + c.TILE_SIZE // 2
                             pygame.draw.line(screen, 'green', tower_pos, targ_pos, 5)
