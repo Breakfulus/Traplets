@@ -39,7 +39,7 @@ class PathfindingSystem:
         return neighbors
 
     def a_star_algorithm(self, grid, start_tile, goal_tile, entity):
-        
+        movement = entity.movement_component
         open_list = [] #explorable tiles
         start_node = Node(start_tile, g=0, h=abs(start_tile[0] - goal_tile[0]) + abs(start_tile[1] - goal_tile[1]))
         heapq.heappush(open_list, start_node) #push the start node, dont need to specify f because node holds its own properties
@@ -50,34 +50,40 @@ class PathfindingSystem:
         closed_set = set()
 
         goal_x, goal_y = goal_tile
+
+        print("FINAL GOAL TILE:", goal_tile)
         
-        if grid.get_tile(goal_x, goal_y, c.STRUCTURES) != None:
-                if not goal_tile or goal_tile == None:
-                    return None
+        if grid.get_tile(goal_x, goal_y, c.STRUCTURES):
+
+            if movement.get('final_tile') is None:
                 best_tile = None
                 best_distance = float('inf')
 
                 neighbors = self.get_neighbors(grid, goal_x, goal_y)
 
                 for row, col in neighbors:
-                    if 0 <= row < grid.grid_height and 0 <= col < grid.grid_width:
-                        if grid.is_not_blocked(row, col):
+                    if not grid.is_not_blocked(row, col):
+                        continue
 
-                            # convert tile → pixel center
-                            tile_x = row * c.TILE_SIZE + c.TILE_SIZE // 2
-                            tile_y = col * c.TILE_SIZE + c.TILE_SIZE // 2
+                    tile_x = col * c.TILE_SIZE + c.TILE_SIZE // 2
+                    tile_y = row * c.TILE_SIZE + c.TILE_SIZE // 2
 
-                            dx = tile_x - entity.position[0]
-                            dy = tile_y - entity.position[1]
+                    dx = tile_x - entity.position[0]
+                    dy = tile_y - entity.position[1]
 
-                            distance = dx*dx + dy*dy  # squared distance
+                    distance = dx*dx + dy*dy
 
-                            if distance < best_distance:
-                                best_distance = distance
-                                best_tile = (row, col)
-                                # print(best_tile)
+                    if distance < best_distance:
+                        best_distance = distance
+                        best_tile = (row, col)
 
-                goal_tile = best_tile
+                if best_tile is not None:
+                    movement['final_tile'] = best_tile
+
+            goal_tile = movement.get('final_tile')
+
+            if goal_tile == None:
+                return None
 
         while open_list and goal_tile != None: #while there are explorable tiles
             current = heapq.heappop(open_list) #takes what is currently explorable and processes it
@@ -119,8 +125,10 @@ class PathfindingSystem:
     def generate_path(self, entity, movement, grid):
         goal_tile = movement['goal']
         
-        if goal_tile == None:
+        if goal_tile is None:
             return None
+        
+        movement['goal'] = goal_tile
 
         goal_tile = (goal_tile[1] // c.TILE_SIZE, goal_tile[0] // c.TILE_SIZE)
         # print(goal_tile)
@@ -129,12 +137,13 @@ class PathfindingSystem:
         path_tiles = self.a_star_algorithm(grid, start_tile, goal_tile, entity)
         
         if path_tiles:
-            pixel_path = [(col * c.TILE_SIZE, row * c.TILE_SIZE) for (row, col) in path_tiles]
+            pixel_path = [(col * c.TILE_SIZE + c.TILE_SIZE // 2, row * c.TILE_SIZE + c.TILE_SIZE // 2) for (row, col) in path_tiles]
             movement['path'] = pixel_path
             movement['target_index'] = 0
         else:
             entity.movement_component["path"] = []
             entity.movement_component["target"] = 0
+            movement['final_tile'] = None
             
         movement['needs_path'] = False
         print("path generated!")
@@ -145,16 +154,15 @@ class PathfindingSystem:
 
             if not structure:
                 continue
-
+            
             if not entity.need["type"] == preference:
-                # print(f"Entity {entity.id} is not a {preference}!")
                 continue
 
             return entity.position
     
     def check_if_path_dirty(self, entity, grid): #Check to see if the path is blocked while moving to the goal
         if not entity.movement_component["path"]:
-            entity.movement_component["path_dirty"] = True
+            entity.movement_component["needs_path"] = True
             return
         
         for tile in entity.movement_component["path"]:
@@ -165,8 +173,6 @@ class PathfindingSystem:
                 print("Path blocked, reclalculating...")
                 entity.movement_component["path_dirty"] = True
                 return
-            
-            
 
     def update(self, entities, structures, grid):
             for entity in entities.values():
@@ -174,15 +180,14 @@ class PathfindingSystem:
                 self.check_if_path_dirty(entity, grid)
 
                 if movement["path_dirty"]:
-                    movement['goal'] = self.get_new_goal(structures, entity.movement_component["prefered_target"])
                     movement["needs_path"] = True
                     movement["path_dirty"] = False
                 
                 if movement["needs_path"]:
+                    if movement.get("goal") is None:
+                        movement["goal"] = self.get_new_goal(
+                            structures,
+                            movement["prefered_targets"][0]
+                        )
+
                     self.generate_path(entity, movement, grid)
-
-
-
-
-
-

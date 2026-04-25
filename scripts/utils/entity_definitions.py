@@ -2,7 +2,7 @@ import pygame
 import utils.consts as c
 
 ENEMY_DEFINITIONS = {
-    'mushant': {
+    'template': {
         'need': {
             'type': 'enemy',
             'layer': c.ENEMIES
@@ -26,7 +26,8 @@ ENEMY_DEFINITIONS = {
             'needs_path': True,
             'path_dirty': False,
             'goal': None,
-            'prefered_target': 'tower'
+            'prefered_targets': ['base', 'tower', 'wall'],
+            'final_tile': None
         },
         "rendering_component":{
             'image path': "red_cube.png",
@@ -37,7 +38,7 @@ ENEMY_DEFINITIONS = {
 }
 
 TOWER_DEFINITIONS = {
-    'mushant': {
+    'template': {
         'need': {
             'type': 'tower',
             'layer': c.STRUCTURES
@@ -75,11 +76,6 @@ TOWER_DEFINITIONS = {
             'max_health': 200,
             'health': 200
         },
-        'combat_component': {
-            'range': 0,
-            'cooldown': 0,
-            'damage': 0
-        },
         "rendering_component":{
             'image path': "purple_cube.png",
             'image': None,
@@ -94,7 +90,7 @@ TOWER_DEFINITIONS = {
 }
 
 PROJECTILE_DEFINITIONS = {
-    'basic': {
+    'template': {
         'need': {
             'type': 'projectile',
             'layer': c.PROJECTILES
@@ -104,6 +100,11 @@ PROJECTILE_DEFINITIONS = {
             'image path': "placeholder_player_projectile.png",
             'image': None,
             'image_rect': None
+        },
+
+        "velocity_component": {
+            'speed': 3,
+            'velocity': [0, 0]
         }
     },
 }

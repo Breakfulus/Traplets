@@ -12,7 +12,7 @@ class PlacementSystem:
         self.grid = grid
         self.preview_tiles = set()
         self.dragging = False
-        self.selected_blueprint = TOWER_DEFINITIONS['mushant'] #What it is placing
+        self.selected_blueprint = TOWER_DEFINITIONS['template'] #What it is placing
 
     def mouse_position(self):
         mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -47,8 +47,8 @@ class PlacementSystem:
     
     def place(self, start_row, start_col, tiles):
         
-        world_x = start_col * c.TILE_SIZE
-        world_y = start_row * c.TILE_SIZE
+        world_x = start_col * c.TILE_SIZE + c.TILE_SIZE // 2
+        world_y = start_row * c.TILE_SIZE + c.TILE_SIZE // 2
         
         place_tower_event = pygame.event.Event(PLACETOWER, pos=(world_x, world_y), tiles=tiles, blueprint=self.selected_blueprint, team='player')
         

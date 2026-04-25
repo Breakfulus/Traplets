@@ -1,6 +1,7 @@
 import pygame
 from utils import consts as c
 from utils.entity_definitions import *
+import math
 
 class CombatSystem:
     def __init__(self, manager):
@@ -21,6 +22,7 @@ class CombatSystem:
 
                 if dx*dx + dy*dy <= radius_sq:
                     tiles.append((row, col))
+        
         print("Tower tiles checked:", tiles)
         return tiles
     
@@ -59,18 +61,39 @@ class CombatSystem:
         now = pygame.time.get_ticks()
 
         if now - entity.combat_component['last_shot'] >= cooldown:
-            self.manager.create_entity(
-            PROJECTILE_DEFINITIONS['basic'],
+
+            if not entity.combat_component['targets']:
+                return
+
+            target = entity.combat_component['targets'][0]
+
+            dx = target.position[0] - entity.position[0]
+            dy = target.position[1] - entity.position[1]
+
+            dist = math.hypot(dx, dy)
+            if dist == 0:
+                return
+            
+            dx /= dist
+            dy /= dist
+
+            projectile = self.manager.create_entity(
+            PROJECTILE_DEFINITIONS['template'],
             (entity.position[0], entity.position[1]),
             [(0, 0)],
             'player',
             eid=None
         )
+            speed = projectile.velocity_component['speed']
+
+            projectile.velocity_component["velocity"] = [dx * speed, dy * speed]
             entity.combat_component['last_shot'] = now
     
     def move_projectiles(self):
         for eid, proj in self.manager.projectiles.items():
-            proj.position[0] -= 1
+            velocity = proj.velocity_component['velocity']
+            proj.position[0] += velocity[0]
+            proj.position[1] += velocity[1]
 
     def update(self, grid, towers):
             self.move_projectiles()
@@ -84,5 +107,5 @@ class CombatSystem:
                 tower.combat_component['targets'] = self.filter_by_exact_range(tower, candidates, range_pixels)
                 print("TOWER:", tower.id)
                 print("TILE:", tower.grid_pos)
-                if tower.combat_component['targets']:
+                if tower.combat_component['targets'] and tower.alive:
                     self.attack(tower, grid, tower.combat_component.get('cooldown') * 1000)

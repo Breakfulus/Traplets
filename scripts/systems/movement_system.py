@@ -1,5 +1,6 @@
 import pygame
 import utils.consts as c
+import math
 
 class MovementSystem:
     def __init__(self):
@@ -23,46 +24,95 @@ class MovementSystem:
             int(entity.position[0] // c.TILE_SIZE))
 
 
-    def move_towards_target(self, entity, movement):
-        if not movement['path'] or movement['path'] == None: #Do nothing if the target doesnt have a set path
-            return
-
+    def move_towards_target(self, entity, movement, sep_x=0, sep_y=0, sep_force=0):
         speed = movement['speed']
         path = movement['path']
         target = movement['target_index']
+        
+        if not path: #Do nothing if the target doesnt have a set path
+            return
 
-        if target != None: 
-            #move if the target has more points in its path
-            target_waypoint = path[target]
-            dx  = target_waypoint[0] - entity.position[0]
-            dy = target_waypoint[1] - entity.position[1]
+        if target == None or target >= len(path): 
+            return
+        
+        #move if the target has more points in its path
+        tx, ty = path[target]
 
-            distance = (dx ** 2 + dy ** 2) ** .5
+        dx  = tx - entity.position[0]
+        dy = ty - entity.position[1]
 
-            if distance <= speed: 
-                #snap enemy to next point if theyre close enough
-                entity.position = [target_waypoint[0], target_waypoint[1]]
-                movement['target_index'] += 1
-                if movement['target_index'] >= len(path):
-                    movement['path'] = None
-                    movement['goal'] = None
-                    movement['needs_path'] = True
-                return
+        distance = math.hypot(dx, dy)
+        
+        #move on x axis before y axis
+        if distance == 0:
+            movement['target_index'] += 1
+            return
+        
+        dx /= distance
+        dy /= distance
+        
+        vx = dx * speed
+        vy = dy * speed
+        vx += sep_x * sep_force
+        vy += sep_y * sep_force
+
+        entity.position[0] += vx
+        entity.position[1] += vy
+
+        if distance <= c.TILE_SIZE // 2:
+            sep_force /= 2
+
+        if distance <= speed:
+            if speed > 0:
+                speed-=1
+
+            movement['target_index'] += 1
+
+            if movement['target_index'] >= len(path):
+                movement['path'] = None
+                movement['goal'] = None
+                movement['needs_path'] = True
+                
+
+    def separate_enemies(self, enemy, enemies):
+        strength = 0
+        sep_x = 0
+        sep_y = 0
+
+        for other in enemies:
             
-            #move on x axis before y axis
-            if distance != 0:
-                dx /= distance
-                dy /= distance
-            entity.position[0] += dx *speed 
-            entity.position[1] += dy * speed 
+            if other == enemy: #ignore itself
+                continue
+        
+            #calc distance between eachother
+            dx = enemy.position[0] - other.position[0]
+            dy = enemy.position[1] - other.position[1]
 
+            dist_sq = dx*dx + dy*dy
+            min_dist = 25
 
-    def update(self, entities, grid, surf):
-        for entity in entities.values():
-            movement = getattr(entity, "movement_component", None) #get the targets movement component
-            self.move_towards_target(entity, movement)
+            #if overlapping completely
+            if dist_sq == 0:
+                continue
 
-            self.update_entity_grid_pos(grid, entity)
+            dist = math.sqrt(dist_sq)
+            
+            if dist <= min_dist:
+                dx /= dist
+                dy /= dist
+
+                strength = 1/dist * 5
+
+                sep_x += dx * strength
+                sep_y += dy * strength
+        
+        return sep_x, sep_y, min_dist
+
+    def update(self, entities, grid):
+        self.grid = grid
+        enemies = list(entities.values())
+        for enemy in enemies:
+            movement = getattr(enemy, "movement_component", None) #get the targets movement component
 
             if not movement["path"] or movement["path"] == None:
                 continue
@@ -70,10 +120,16 @@ class MovementSystem:
             if movement["path_dirty"]:
                 continue
             
-            if not movement['needs_path']: #draw a debug path
-                debug_path = []
-                for (x, y) in entity.movement_component["path"]:
-                    x += c.TILE_SIZE // 2
-                    y += c.TILE_SIZE // 2
-                    debug_path.append((x, y))
-                pygame.draw.lines(surf, 'blue', False, debug_path, 5)
+            # if not movement['needs_path']: #draw a debug path
+            #     debug_path = []
+            #     for (x, y) in enemy.movement_component["path"]:
+            #         x += c.TILE_SIZE // 2
+            #         y += c.TILE_SIZE // 2
+            #         debug_path.append((x, y))
+            #     pygame.draw.lines(surf, 'blue', False, debug_path, 5)
+
+            sep_x, sep_y, sep_force = self.separate_enemies(enemy, enemies)
+
+            self.move_towards_target(enemy, movement, sep_x, sep_y, sep_force)
+
+            self.update_entity_grid_pos(grid, enemy)

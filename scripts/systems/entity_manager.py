@@ -76,7 +76,7 @@ class EntityManager:
                 entity_image = entity.rendering_component['image']
                 rect = entity_image.get_rect()
                 entity.rendering_component['image_rect'] = rect
-                rect.topleft = entity.position
+                rect.center = entity.position
                 screen.blit(entity_image, rect)
         
         for entity in sorted_entities:
