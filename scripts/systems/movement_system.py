@@ -19,9 +19,9 @@ class MovementSystem:
             grid.remove_from_tile(old_row, old_col, c.ENEMIES, entity_id)
 
         entity.grid_pos = (new_row, new_col)
-        print("Enemy actual tile:",
-            int(entity.position[1] // c.TILE_SIZE),
-            int(entity.position[0] // c.TILE_SIZE))
+        # print("Enemy actual tile:",
+        #     int(entity.position[1] // c.TILE_SIZE),
+        #     int(entity.position[0] // c.TILE_SIZE))
 
 
     def move_towards_target(self, entity, movement, sep_x=0, sep_y=0, sep_force=0):
@@ -60,11 +60,12 @@ class MovementSystem:
         entity.position[1] += vy
 
         if distance <= c.TILE_SIZE // 2:
-            sep_force /= 2
+            sep_force /= 5
 
         if distance <= speed:
             if speed > 0:
                 speed-=1
+            
 
             movement['target_index'] += 1
 
@@ -75,6 +76,7 @@ class MovementSystem:
                 
 
     def separate_enemies(self, enemy, enemies):
+        min_dist = 25
         strength = 0
         sep_x = 0
         sep_y = 0
@@ -89,19 +91,19 @@ class MovementSystem:
             dy = enemy.position[1] - other.position[1]
 
             dist_sq = dx*dx + dy*dy
-            min_dist = 25
+            
 
             #if overlapping completely
             if dist_sq == 0:
                 continue
 
             dist = math.sqrt(dist_sq)
-            
+
             if dist <= min_dist:
                 dx /= dist
                 dy /= dist
 
-                strength = 1/dist * 5
+                strength = 1/dist * 5.5
 
                 sep_x += dx * strength
                 sep_y += dy * strength
@@ -119,14 +121,6 @@ class MovementSystem:
 
             if movement["path_dirty"]:
                 continue
-            
-            # if not movement['needs_path']: #draw a debug path
-            #     debug_path = []
-            #     for (x, y) in enemy.movement_component["path"]:
-            #         x += c.TILE_SIZE // 2
-            #         y += c.TILE_SIZE // 2
-            #         debug_path.append((x, y))
-            #     pygame.draw.lines(surf, 'blue', False, debug_path, 5)
 
             sep_x, sep_y, sep_force = self.separate_enemies(enemy, enemies)
 

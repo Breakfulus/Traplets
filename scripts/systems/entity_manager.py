@@ -91,11 +91,11 @@ class EntityManager:
                     if not entity.combat_component.get('targets'):
                         print("No target!")
                         continue
-
-                    for target in entity.combat_component['targets']:
-                            tower_pos = entity.position[0] + c.TILE_SIZE // 2, entity.position[1] + c.TILE_SIZE // 2
-                            targ_pos = target.position[0] + c.TILE_SIZE // 2, target.position[1] + c.TILE_SIZE // 2
-                            pygame.draw.line(screen, 'green', tower_pos, targ_pos, 5)
+                    
+                    target = entity.combat_component['targets'][0]
+                    tower_pos = entity.position[0], entity.position[1]
+                    targ_pos = target.position[0], target.position[1]
+                    pygame.draw.line(screen, 'green', tower_pos, targ_pos, 5)
                     if not entity.rendering_component['image']:
                         print(f"Entity {entity.id} has no image!")
     

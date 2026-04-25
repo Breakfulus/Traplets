@@ -23,7 +23,7 @@ class CombatSystem:
                 if dx*dx + dy*dy <= radius_sq:
                     tiles.append((row, col))
         
-        print("Tower tiles checked:", tiles)
+        print("entity tiles checked:", tiles)
         return tiles
     
     def get_entities_in_range(self, grid, row, col, radius, entity):
@@ -31,7 +31,7 @@ class CombatSystem:
         ids = []
 
         for r, c_ in tiles:
-            ids.extend(grid.get_tile(r, c_, c.ENEMIES))
+            ids.extend(grid.get_tile(r, c_, entity.need['target_layer']))
 
         print("IDS:", ids)
         
@@ -45,6 +45,7 @@ class CombatSystem:
         result = []
 
         for target in targets:
+
             dx = target.position[0] - entity.position[0]
             dy = target.position[1] - entity.position[1]
 
@@ -81,7 +82,7 @@ class CombatSystem:
             PROJECTILE_DEFINITIONS['template'],
             (entity.position[0], entity.position[1]),
             [(0, 0)],
-            'player',
+            entity.team,
             eid=None
         )
             speed = projectile.velocity_component['speed']
@@ -95,17 +96,26 @@ class CombatSystem:
             proj.position[0] += velocity[0]
             proj.position[1] += velocity[1]
 
-    def update(self, grid, towers):
+    def update(self, grid, entities):
+            
             self.move_projectiles()
-            for tower in towers:
+            for entity in entities:
+                combat = getattr(entity, "combat_component", None)
 
-                row, col = tower.grid_pos
-                range_pixels = tower.combat_component['range'] * c.TILE_SIZE
+                if not combat:
+                    continue
 
-                candidates = self.get_entities_in_range(grid, row, col, tower.combat_component['range'], tower)
+                if entity.need['type'] != 'tower':
+                    continue
 
-                tower.combat_component['targets'] = self.filter_by_exact_range(tower, candidates, range_pixels)
-                print("TOWER:", tower.id)
-                print("TILE:", tower.grid_pos)
-                if tower.combat_component['targets'] and tower.alive:
-                    self.attack(tower, grid, tower.combat_component.get('cooldown') * 1000)
+                row, col = entity.grid_pos
+                range_pixels = combat['range'] * c.TILE_SIZE
+
+                candidates = self.get_entities_in_range(grid, row, col, combat['range'], entity)
+
+                combat['targets'] = self.filter_by_exact_range(entity, candidates, range_pixels)
+
+                print("entity:", entity.id)
+                print("TILE:", entity.grid_pos)
+                if combat['targets'] and entity.alive:
+                    self.attack(entity, grid, combat.get('cooldown') * 1000)

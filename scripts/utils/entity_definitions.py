@@ -5,7 +5,8 @@ ENEMY_DEFINITIONS = {
     'template': {
         'need': {
             'type': 'enemy',
-            'layer': c.ENEMIES
+            'layer': c.ENEMIES,
+            'target_layer': c.STRUCTURES
         },
         'health_component': {
             'max_health': 200,
@@ -17,7 +18,8 @@ ENEMY_DEFINITIONS = {
             'cooldown': 2,
             'damage': 5,
             'targets': [],
-            'target_priority': 'first'
+            'target_priority': 'first',
+            'last_shot': 0
         },
         'movement_component': {
             'speed': 3,
@@ -41,7 +43,8 @@ TOWER_DEFINITIONS = {
     'template': {
         'need': {
             'type': 'tower',
-            'layer': c.STRUCTURES
+            'layer': c.STRUCTURES,
+            'target_layer': c.ENEMIES
         },
         'health_component': {
             'max_health': 200,
@@ -70,7 +73,8 @@ TOWER_DEFINITIONS = {
     'base': {
         'need': {
             'type': 'base',
-            'layer': c.STRUCTURES
+            'layer': c.STRUCTURES,
+            'target_layer': c.ENEMIES
         },
         'health_component': {
             'max_health': 200,
