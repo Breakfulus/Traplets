@@ -19,7 +19,8 @@ ENEMY_DEFINITIONS = {
             'damage': 5,
             'targets': [],
             'target_priority': 'first',
-            'last_shot': 0
+            'last_shot': 0,
+            'last_hit': 0
         },
         'movement_component': {
             'speed': 3,
@@ -32,7 +33,7 @@ ENEMY_DEFINITIONS = {
             'final_tile': None
         },
         "collision_component":{
-            'collider': 200,
+            'collider': 26,
             'is_colliding': False,
             'type': "enemy"
         },
@@ -59,13 +60,14 @@ TOWER_DEFINITIONS = {
             'type': 'single_shot',
             'range': 4,
             'cooldown': 2,
-            'damage': 5,
+            'damage': 10,
             'targets': [],
             'target_priority': 'first',
-            'last_shot': 0
+            'last_shot': 0,
+            'last_hit': 0
         },
         "collision_component":{
-            'collider': 37,
+            'collider': 26,
             'is_colliding': False,
             'type': "structure"
         },
@@ -97,7 +99,7 @@ TOWER_DEFINITIONS = {
             'image_rect': None
         },
         "collision_component":{
-            'collider': 37,
+            'collider': 26,
             'is_colliding': False,
             'type': "structure"
         },
@@ -123,7 +125,7 @@ PROJECTILE_DEFINITIONS = {
         },
 
         "collision_component":{
-            'collider': 18,
+            'collider':20,
             'is_colliding': False,
             'type': "projectile"
         },
@@ -131,6 +133,14 @@ PROJECTILE_DEFINITIONS = {
         "velocity_component": {
             'speed': 3,
             'velocity': [0, 0]
+        },
+
+        "damage_component": {
+            'damage': 0
+        },
+
+        "peirce_component":{
+            'peirce': 0
         }
     },
 }

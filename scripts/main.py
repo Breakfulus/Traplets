@@ -14,7 +14,7 @@ PLACETOWER = pygame.USEREVENT + 1
 DESTROYTOWER = pygame.USEREVENT + 2
 SELECTTOWER = pygame.USEREVENT + 3
 
-screen = pygame.display.set_mode((c.SCREEN_WIDTH + c.UI_PANEL, c.SCREEN_HEIGHT), pygame.SCALED | pygame.RESIZABLE)
+screen = pygame.display.set_mode((c.SCREEN_WIDTH + c.UI_PANEL, c.SCREEN_HEIGHT), pygame.SCALED | pygame.RESIZABLE | pygame.FULLSCREEN)
 pygame.display.set_caption("Traplet Tower Defense")
 
 clock = pygame.time.Clock()
@@ -49,7 +49,7 @@ while running:
                 pygame.display.toggle_fullscreen()
         
             if event.key == pygame.K_c:
-                if c.MODE == 0: c.MODE = 1 
+                if c.MODE == 0: c.MODE = 1
                 else: c.MODE = 0
 
         place_system.placement_system_events(event)
@@ -58,7 +58,7 @@ while running:
             manager.create_entity(event.blueprint, event.pos, event.tiles, event.team)
 
         if event.type == DESTROYTOWER:
-            manager.kill_entity(event.eid, c.STRUCTURES)
+            manager.entities[event.eid].alive = False
         
         if event.type == SELECTTOWER:
             print(f"Entity {event.eid} selected!")

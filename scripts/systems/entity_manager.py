@@ -47,20 +47,16 @@ class EntityManager:
         print(self.enemies)
         return entity
     
-    def kill_entity(self, entity_id, layer):
-        print(entity_id)
-        entity = self.entities[entity_id]
-
-        for r in range(self.grid.grid_height):
-            for c_ in range(self.grid.grid_width):
-                if entity_id in self.grid.get_tile(r, c_, layer):
-                    self.grid.remove_from_tile(r, c_, layer, entity_id)
-
-        entity.alive = False
-    
     def entity_clean_up(self):
         for eid, entity in self.entities.items():
             if not entity.alive:
+
+                #remove all of that entity from the grid
+                for r in range(self.grid.grid_height):
+                    for c_ in range(self.grid.grid_width):
+                        if eid in self.grid.get_tile(r, c_, entity.need['layer']):
+                            self.grid.remove_from_tile(r, c_, entity.need['layer'], eid)
+                #actually remove the entity
                 del self.entities[eid]
                 return
     

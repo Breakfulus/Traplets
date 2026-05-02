@@ -36,8 +36,13 @@ class CombatSystem:
 
         print("IDS:", ids)
         
-        targets = [self.manager.entities[eid] for eid in ids]
+
+        for id in ids:
+            if id not in self.manager.entities.keys():
+                ids.remove(id)
         
+        targets = [self.manager.entities[eid] for eid in ids]
+
         print("TARGETS:", targets)
         return targets
 
@@ -83,6 +88,7 @@ class CombatSystem:
             speed = projectile.velocity_component['speed']
 
             projectile.velocity_component["velocity"] = [dx * speed, dy * speed]
+            projectile.damage_component['damage'] = entity.combat_component['damage']
             entity.combat_component['last_shot'] = now
     
     def move_projectiles(self):
@@ -92,20 +98,43 @@ class CombatSystem:
             proj.position[1] += velocity[1]
     
     def apply_damage(self, projectile, target):
-        target.health_component['health'] -= projectile.projectile_component['damage']
+        now = pygame.time.get_ticks()
+        if now - target.combat_component['last_hit'] >= .5*1000: #Invincibility time; prevents entities from getting hit by same proj twice
 
-        if projectile.projectile_compoenent['peirce'] == 0:
-            projectile.alive = False
-        else:
-            projectile.projectile_component['peirce'] -= 1
+            target.health_component['health'] -= projectile.damage_component['damage']
+
+            target.combat_component['last_hit'] = now #reset incibility reference
         
-        if target.health_compoenent['health'] <= 0:
+        if target.health_component['health'] <= 0: #kill entity if its health is 0
             target.alive = False
-    
+        
+    def get_projectile_hits(self):
+        for projectile in self.manager.projectiles.values():
+            for entity in self.manager.entities.values(): #goes through all entities for every projectile
+
+                if entity == projectile: #projectile cant hit projectiles
+                    continue
+
+                if entity.team == projectile.team: #no friendly fire
+                    continue
+                
+                if circle_collision(projectile.position, projectile.collision_component['collider'], entity.position, entity.collision_component['collider']):
+                    #apply damage before killing the projectile so projectiles with pierce arent destroyed by dead entity
+                    self.apply_damage(projectile, entity)
+
+                    if projectile.peirce_component['peirce'] != 0: #dont kill projectile if it can hit multiple entities
+                        projectile.peirce_component['peirce'] -= 1
+                    else:
+                        projectile.alive = False
+
+                    
 
     def update(self, grid, entities):
             
             self.move_projectiles()
+
+            self.get_projectile_hits()
+
             for entity in entities:
                 combat = getattr(entity, "combat_component", None)
 
