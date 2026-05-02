@@ -59,16 +59,13 @@ class MovementSystem:
         entity.position[0] += vx
         entity.position[1] += vy
 
-        if distance <= c.TILE_SIZE // 2:
-            sep_force /= 5
-
-        if distance <= speed:
+        if distance <= speed: #If close enough to waypoint, go to the next one
             if speed > 0:
                 speed-=1
-            
 
             movement['target_index'] += 1
 
+            #If at the end of the path
             if movement['target_index'] >= len(path):
                 movement['path'] = None
                 movement['goal'] = None
@@ -85,21 +82,24 @@ class MovementSystem:
             
             if other == enemy: #ignore itself
                 continue
-        
+
             #calc distance between eachother
             dx = enemy.position[0] - other.position[0]
             dy = enemy.position[1] - other.position[1]
 
+            r = other.collision_component['collider']
+
             dist_sq = dx*dx + dy*dy
             
-
             #if overlapping completely
             if dist_sq == 0:
                 continue
-
+            
+            #get true distance
             dist = math.sqrt(dist_sq)
 
-            if dist <= min_dist:
+            #make push stronger if closer together
+            if dist <= min_dist + r:
                 dx /= dist
                 dy /= dist
 
@@ -115,6 +115,9 @@ class MovementSystem:
         enemies = list(entities.values())
         for enemy in enemies:
             movement = getattr(enemy, "movement_component", None) #get the targets movement component
+
+            if not movement:
+                continue
 
             if not movement["path"] or movement["path"] == None:
                 continue

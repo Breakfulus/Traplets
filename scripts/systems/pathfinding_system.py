@@ -18,22 +18,22 @@ class PathfindingSystem:
     def __init__(self):
         pass
 
-    def get_neighbors(self, grid, row, col):
+    def get_neighbors(self, grid, row, col, goal_tile):
         
         #Make sure the bounds check comes before detecting if the tile is filed.
         
         neighbors = []
 
-        if row > 0 and grid.is_not_blocked(row - 1, col):
+        if row > 0 and grid.is_not_blocked(row - 1, col) or (row - 1, col) == goal_tile:
             neighbors.append((row - 1, col))
         
-        if col > 0 and grid.is_not_blocked(row, col - 1):
+        if col > 0 and grid.is_not_blocked(row, col - 1) or (row, col - 1) == goal_tile:
             neighbors.append((row, col - 1))
 
-        if row < c.GRID_HEIGHT - 1 and grid.is_not_blocked(row + 1, col):
+        if row < c.GRID_HEIGHT - 1 and grid.is_not_blocked(row + 1, col) or (row + 1, col) == goal_tile:
             neighbors.append((row + 1, col))
         
-        if col < c.GRID_WIDTH - 1 and grid.is_not_blocked(row, col + 1):
+        if col < c.GRID_WIDTH - 1 and grid.is_not_blocked(row, col + 1) or (row, col + 1) == goal_tile:
             neighbors.append((row, col + 1))
 
         return neighbors
@@ -53,37 +53,39 @@ class PathfindingSystem:
 
         print("FINAL GOAL TILE:", goal_tile)
         
-        if grid.get_tile(goal_x, goal_y, c.STRUCTURES):
+        # if grid.get_tile(goal_x, goal_y, c.STRUCTURES):
 
-            if movement.get('final_tile') is None:
-                best_tile = None
-                best_distance = float('inf')
+        #     if movement.get('final_tile') is None:
+        #         best_tile = None
+        #         best_distance = float('inf')
 
-                neighbors = self.get_neighbors(grid, goal_x, goal_y)
+        #         neighbors = self.get_neighbors(grid, goal_x, goal_y)
 
-                for row, col in neighbors:
-                    if not grid.is_not_blocked(row, col):
-                        continue
+        #         for row, col in neighbors:
+        #             if not grid.is_not_blocked(row, col):
+        #                 continue
 
-                    tile_x = col * c.TILE_SIZE + c.TILE_SIZE // 2
-                    tile_y = row * c.TILE_SIZE + c.TILE_SIZE // 2
+        #             tile_x = col * c.TILE_SIZE + c.TILE_SIZE // 2
+        #             tile_y = row * c.TILE_SIZE + c.TILE_SIZE // 2
 
-                    dx = tile_x - entity.position[0]
-                    dy = tile_y - entity.position[1]
+        #             dx = tile_x - entity.position[0]
+        #             dy = tile_y - entity.position[1]
 
-                    distance = dx*dx + dy*dy
+        #             distance = dx*dx + dy*dy
 
-                    if distance < best_distance:
-                        best_distance = distance
-                        best_tile = (row, col)
+        #             if distance < best_distance:
+        #                 best_distance = distance
+        #                 best_tile = (row, col)
 
-                if best_tile is not None:
-                    movement['final_tile'] = best_tile
+        #         if best_tile is not None:
+        #             movement['final_tile'] = best_tile
+        #     goal_tile = movement.get('final_tile')
 
-            goal_tile = movement.get('final_tile')
+        #     goal_tile = movement.get('final_tile')
 
-            if goal_tile == None:
-                return None
+        #     if goal_tile == None:
+        #         return None
+        movement['final_tile'] = goal_tile
 
         while open_list and goal_tile != None: #while there are explorable tiles
             current = heapq.heappop(open_list) #takes what is currently explorable and processes it
@@ -102,7 +104,7 @@ class PathfindingSystem:
                 path.reverse()
                 return path
 
-            neighbors = self.get_neighbors(grid, *current.position)
+            neighbors = self.get_neighbors(grid, *current.position, goal_tile)
 
             for nx, ny in neighbors:
                 neighbor = (nx, ny)
@@ -125,10 +127,11 @@ class PathfindingSystem:
     def generate_path(self, entity, movement, grid):
         
         goal_tile = None
+
         try:
             goal_tile = movement['goal'].position
         except: 
-            AttributeError
+            return None
 
         if goal_tile is None:
             return None
@@ -192,6 +195,9 @@ class PathfindingSystem:
             row = tile[1] // c.TILE_SIZE
             col = tile[0] // c.TILE_SIZE
 
+            if (row, col) == entity.movement_component["final_tile"]:
+                continue
+
             if not grid.is_not_blocked(row, col):
                 print("Path blocked, reclalculating...")
                 entity.movement_component["path_dirty"] = True
@@ -203,8 +209,6 @@ class PathfindingSystem:
 
                 if not movement:
                     continue
-
-                
 
                 self.check_if_path_dirty(entity, grid)
 

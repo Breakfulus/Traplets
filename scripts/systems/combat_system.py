@@ -2,6 +2,7 @@ import pygame
 from utils import consts as c
 from utils.entity_definitions import *
 import math
+from utils.geometry import *
 
 class CombatSystem:
     def __init__(self, manager):
@@ -41,17 +42,11 @@ class CombatSystem:
         return targets
 
     def filter_by_exact_range(self, entity, targets, radius):
-        radius_sq = radius * radius
         result = []
 
         for target in targets:
 
-            dx = target.position[0] - entity.position[0]
-            dy = target.position[1] - entity.position[1]
-
-            print("DISTANCES:", [(dx*dx + dy*dy, "vs", radius_sq)])
-
-            if dx*dx + dy*dy <= radius_sq:
+            if get_dist_sq(entity.position, target.position) <= radius*radius:
                 result.append(target)
 
         print("LOS RESULT:", result)
@@ -95,6 +90,18 @@ class CombatSystem:
             velocity = proj.velocity_component['velocity']
             proj.position[0] += velocity[0]
             proj.position[1] += velocity[1]
+    
+    def apply_damage(self, projectile, target):
+        target.health_component['health'] -= projectile.projectile_component['damage']
+
+        if projectile.projectile_compoenent['peirce'] == 0:
+            projectile.alive = False
+        else:
+            projectile.projectile_component['peirce'] -= 1
+        
+        if target.health_compoenent['health'] <= 0:
+            target.alive = False
+    
 
     def update(self, grid, entities):
             

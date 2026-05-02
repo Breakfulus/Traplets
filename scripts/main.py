@@ -10,6 +10,10 @@ import utils.consts as c
 
 pygame.init()
 
+PLACETOWER = pygame.USEREVENT + 1
+DESTROYTOWER = pygame.USEREVENT + 2
+SELECTTOWER = pygame.USEREVENT + 3
+
 screen = pygame.display.set_mode((c.SCREEN_WIDTH + c.UI_PANEL, c.SCREEN_HEIGHT), pygame.SCALED | pygame.RESIZABLE)
 pygame.display.set_caption("Traplet Tower Defense")
 
@@ -17,35 +21,19 @@ clock = pygame.time.Clock()
 
 grid = Grid(c.GRID_HEIGHT, c.GRID_WIDTH, c.TILE_SIZE)
 
-preview_tiles = set()
-
 place_system = PlacementSystem(grid)
-pathfinding_system = PathfindingSystem()
-
-PLACETOWER = pygame.USEREVENT + 1
-DESTROYTOWER = pygame.USEREVENT + 2
-SELECTTOWER = pygame.USEREVENT + 3
+preview_tiles = set()
 
 manager = EntityManager(grid)
 
 combat_system = CombatSystem(manager)
 
-mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['template'], (0 * c.TILE_SIZE + c.TILE_SIZE // 2, 0 * c.TILE_SIZE + c.TILE_SIZE // 2), [(0, 0)], 'enemy')
-mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['template'], (0 * c.TILE_SIZE + c.TILE_SIZE // 2, 0 * c.TILE_SIZE + c.TILE_SIZE // 2), [(0, 0)], 'enemy')
-mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['template'], (0 * c.TILE_SIZE + c.TILE_SIZE // 2, 0 * c.TILE_SIZE + c.TILE_SIZE // 2), [(0, 0)], 'enemy')
-mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['template'], (0 * c.TILE_SIZE + c.TILE_SIZE // 2, 0 * c.TILE_SIZE + c.TILE_SIZE // 2), [(0, 0)], 'enemy')
-mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['template'], (0 * c.TILE_SIZE + c.TILE_SIZE // 2, 0 * c.TILE_SIZE + c.TILE_SIZE // 2), [(0, 0)], 'enemy')
-mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['template'], (0 * c.TILE_SIZE + c.TILE_SIZE // 2, 0 * c.TILE_SIZE + c.TILE_SIZE // 2), [(0, 0)], 'enemy')
-mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['template'], (0 * c.TILE_SIZE + c.TILE_SIZE // 2, 0 * c.TILE_SIZE + c.TILE_SIZE // 2), [(0, 0)], 'enemy')
-mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['template'], (0 * c.TILE_SIZE + c.TILE_SIZE // 2, 0 * c.TILE_SIZE + c.TILE_SIZE // 2), [(0, 0)], 'enemy')
-
-
-base = manager.create_entity(TOWER_DEFINITIONS['base'], (4 * c.TILE_SIZE + c.TILE_SIZE // 2, 4 * c.TILE_SIZE + c.TILE_SIZE // 2), [(4, 4)], 'player')
-base = manager.create_entity(TOWER_DEFINITIONS['base'], (8 * c.TILE_SIZE + c.TILE_SIZE // 2,8 * c.TILE_SIZE + c.TILE_SIZE // 2), [(8, 8)], 'player')
 enemy_movement = MovementSystem()
-
+pathfinding_system = PathfindingSystem()
 pathfinding_system.update(manager.enemies, manager.entities, grid)
 
+mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['template'], (0 * c.TILE_SIZE + c.TILE_SIZE // 2, 0 * c.TILE_SIZE + c.TILE_SIZE // 2), [(0, 0)], 'enemy')
+base = manager.create_entity(TOWER_DEFINITIONS['base'], (4 * c.TILE_SIZE + c.TILE_SIZE // 2, 4 * c.TILE_SIZE + c.TILE_SIZE // 2), [(4, 4)], 'player')
 
 running = True
 while running:
@@ -76,13 +64,14 @@ while running:
             print(f"Entity {event.eid} selected!")
             manager.select_entity(event.eid)
     
+
     #Add selected tiles during building to selection
     place_system.building_selection()
     
     #Make enemies move
     pathfinding_system.update(manager.enemies, manager.entities, grid)
-    enemy_movement.update(manager.enemies, grid)
-    # combat_system.update(grid, list(manager.entities.values()))
+    enemy_movement.update(manager.entities, grid)
+    combat_system.update(grid, list(manager.entities.values()))
     
     grid.update()
 
