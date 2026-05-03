@@ -3,6 +3,7 @@ from utils import consts as c
 from utils.entity_definitions import *
 import math
 from utils.geometry import *
+from utils.attacks import ATTACKS
 
 class CombatSystem:
     def __init__(self, manager):
@@ -68,28 +69,22 @@ class CombatSystem:
 
             target = entity.combat_component['targets'][0]
 
-            dx = target.position[0] - entity.position[0]
-            dy = target.position[1] - entity.position[1]
+            attack_type = entity.combat_component['type']
+            entity.combat_component['func'] = ATTACKS[attack_type]
+            attack_func = entity.combat_component['func']
 
-            dist = math.hypot(dx, dy)
-            if dist == 0:
-                return
-            
-            dx /= dist
-            dy /= dist
-
-            projectile = self.manager.create_entity(
-            PROJECTILE_DEFINITIONS['template'],
-            (entity.position[0], entity.position[1]),
-            [(0, 0)],
-            entity.team,
-            eid=None
-        )
-            speed = projectile.velocity_component['speed']
-
-            projectile.velocity_component["velocity"] = [dx * speed, dy * speed]
-            projectile.damage_component['damage'] = entity.combat_component['damage']
+            attack_func(entity, target, 
+                        self.manager.create_entity(
+                PROJECTILE_DEFINITIONS['template'],
+                (entity.position[0], entity.position[1]),
+                [(0, 0)],
+                entity.team,
+                eid=None
+            ))
+        
             entity.combat_component['last_shot'] = now
+
+
     
     def move_projectiles(self):
         for eid, proj in self.manager.projectiles.items():

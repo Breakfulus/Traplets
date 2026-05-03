@@ -1,12 +1,13 @@
 import pygame
-from systems.entity_manager import EntityManager
 from grid import Grid
+from systems.entity_manager import EntityManager
 from systems.placement_system import PlacementSystem
 from systems.movement_system import MovementSystem
 from systems.pathfinding_system import PathfindingSystem
 from systems.combat_system import CombatSystem
-from utils.entity_definitions import *
 import utils.consts as c
+from utils.entity_definitions import *
+
 
 pygame.init()
 
