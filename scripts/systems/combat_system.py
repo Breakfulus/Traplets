@@ -83,8 +83,6 @@ class CombatSystem:
             ))
         
             entity.combat_component['last_shot'] = now
-
-
     
     def move_projectiles(self):
         for eid, proj in self.manager.projectiles.items():
@@ -94,11 +92,11 @@ class CombatSystem:
     
     def apply_damage(self, projectile, target):
         now = pygame.time.get_ticks()
-        if now - target.combat_component['last_hit'] >= .5*1000: #Invincibility time; prevents entities from getting hit by same proj twice
+        if now - target.health_component['last_hit'] >= .5*1000: #Invincibility time; prevents entities from getting hit by same proj twice
 
             target.health_component['health'] -= projectile.damage_component['damage']
 
-            target.combat_component['last_hit'] = now #reset incibility reference
+            target.health_component['last_hit'] = now #reset incibility reference
         
         if target.health_component['health'] <= 0: #kill entity if its health is 0
             target.alive = False
@@ -107,13 +105,14 @@ class CombatSystem:
         for projectile in self.manager.projectiles.values():
             for entity in self.manager.entities.values(): #goes through all entities for every projectile
 
-                if entity == projectile: #projectile cant hit projectiles
+                if entity.need['type'] == 'projectile': #projectile cant hit projectiles
                     continue
 
                 if entity.team == projectile.team: #no friendly fire
                     continue
                 
                 if circle_collision(projectile.position, projectile.collision_component['collider'], entity.position, entity.collision_component['collider']):
+                    print(projectile, entity, projectile.team, entity.team)
                     #apply damage before killing the projectile so projectiles with pierce arent destroyed by dead entity
                     self.apply_damage(projectile, entity)
 
@@ -121,8 +120,6 @@ class CombatSystem:
                         projectile.peirce_component['peirce'] -= 1
                     else:
                         projectile.alive = False
-
-                    
 
     def update(self, grid, entities):
             
@@ -134,9 +131,6 @@ class CombatSystem:
                 combat = getattr(entity, "combat_component", None)
 
                 if not combat:
-                    continue
-
-                if entity.need['type'] != 'tower':
                     continue
 
                 row, col = entity.grid_pos

@@ -1,6 +1,7 @@
 import pygame
 import utils.consts as c
 import math
+from utils.geometry import *
 
 class MovementSystem:
     def __init__(self):
@@ -24,7 +25,7 @@ class MovementSystem:
         #     int(entity.position[0] // c.TILE_SIZE))
 
 
-    def move_towards_target(self, entity, movement, sep_x=0, sep_y=0, sep_force=0):
+    def move_towards_target(self, entity, movement, sep_force=(0, 0), knockback_force=0, collision_force=(0, 0)):
         speed = movement['speed']
         path = movement['path']
         target = movement['target_index']
@@ -47,25 +48,41 @@ class MovementSystem:
         if distance == 0:
             movement['target_index'] += 1
             return
+
+        col_x, col_y = collision_force
+        sep_x, sep_y = sep_force
         
         dx /= distance
         dy /= distance
         
         vx = dx * speed
         vy = dy * speed
-        vx += sep_x * sep_force
-        vy += sep_y * sep_force
+        vx += sep_x + col_x
+        vy += sep_y + col_y
+
+        #gradually dampen velocity
+        vx *= .9
+        vy *= .9
 
         entity.position[0] += vx
         entity.position[1] += vy
 
-        if distance <= speed: #If close enough to waypoint, go to the next one
+        #cap velocity
+        max_speed = 3
+
+        speed = math.sqrt(vx*vx + vy*vy)
+        if speed > max_speed:
+            vx = (vx / speed) * max_speed
+            vy = (vy / speed) * max_speed
+
+
+        if distance <= speed: #If close enough to waypoint, slow down
             if speed > 0:
                 speed-=1
 
             movement['target_index'] += 1
 
-            #If at the end of the path
+            #If at the end of the path, find new goal
             if movement['target_index'] >= len(path):
                 movement['path'] = None
                 movement['goal'] = None
@@ -73,42 +90,55 @@ class MovementSystem:
                 
 
     def separate_enemies(self, enemy, enemies):
-        min_dist = 25
-        strength = 0
-        sep_x = 0
-        sep_y = 0
+        total_x = 0
+        total_y = 0
+        count = 0
 
         for other in enemies:
             
             if other == enemy: #ignore itself
                 continue
+            
+            if other.need['type'] != 'enemy':
+                continue
+            
 
-            #calc distance between eachother
-            dx = enemy.position[0] - other.position[0]
-            dy = enemy.position[1] - other.position[1]
-
-            r = other.collision_component['collider']
-
-            dist_sq = dx*dx + dy*dy
+            dist_sq = get_dist_sq(other.position, enemy.position)
             
             #if overlapping completely
             if dist_sq == 0:
                 continue
             
             #get true distance
-            dist = math.sqrt(dist_sq)
+            other_pos = other.position
+            enemy_pos = enemy.position
 
             #make push stronger if closer together
-            if dist <= min_dist + r:
-                dx /= dist
-                dy /= dist
+            if circle_collision(other_pos, other.collision_component['collider'], enemy_pos, enemy.collision_component['collider']):
 
-                strength = 1/dist * 5.5
+                #account for new entity colliding
+                count += 1
 
-                sep_x += dx * strength
-                sep_y += dy * strength
-        
-        return sep_x, sep_y, min_dist
+                sep_x, sep_y = circle_overlap_vector(other_pos, other.collision_component['collider'], enemy_pos, enemy.collision_component['collider'])
+
+                other.position[0] += sep_x
+                other.position[1] += sep_y
+
+                #Accumulate total force - (DONT FORGET TO DO THIS NEXT TIME!)
+                total_x += sep_x
+                total_y += sep_y
+            
+            if count > 0: #get the average force over all entities applying force to this one
+                total_x /= count
+                total_y /= count
+                    
+        return total_x, total_y
+    
+    def get_knockback(self):
+        pass
+
+    def get_collisions(self):
+        pass
 
     def update(self, entities, grid):
         self.grid = grid
@@ -125,8 +155,8 @@ class MovementSystem:
             if movement["path_dirty"]:
                 continue
 
-            sep_x, sep_y, sep_force = self.separate_enemies(enemy, enemies)
+            sep_force = self.separate_enemies(enemy, enemies)
 
-            self.move_towards_target(enemy, movement, sep_x, sep_y, sep_force)
+            self.move_towards_target(enemy, movement, sep_force)
 
             self.update_entity_grid_pos(grid, enemy)

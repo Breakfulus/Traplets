@@ -34,6 +34,9 @@ pathfinding_system = PathfindingSystem()
 pathfinding_system.update(manager.enemies, manager.entities, grid)
 
 mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['template'], (0 * c.TILE_SIZE + c.TILE_SIZE // 2, 0 * c.TILE_SIZE + c.TILE_SIZE // 2), [(0, 0)], 'enemy')
+mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['template'], (0 * c.TILE_SIZE + c.TILE_SIZE // 2, 1 * c.TILE_SIZE + c.TILE_SIZE // 2), [(1, 0)], 'enemy')
+mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['template'], (0 * c.TILE_SIZE + c.TILE_SIZE // 2, 2 * c.TILE_SIZE + c.TILE_SIZE // 2), [(2, 0)], 'enemy')
+
 base = manager.create_entity(TOWER_DEFINITIONS['base'], (4 * c.TILE_SIZE + c.TILE_SIZE // 2, 4 * c.TILE_SIZE + c.TILE_SIZE // 2), [(4, 4)], 'player')
 
 running = True
@@ -76,7 +79,7 @@ while running:
     
     grid.update()
 
-    #---Draw section
+    #---Draw section---
     screen.fill('darkslateblue')
 
     grid.draw_grid(screen)

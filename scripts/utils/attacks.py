@@ -18,6 +18,7 @@ def single_shot(attacker, target, spawn_projectile):
 
     projectile.velocity_component["velocity"] = [dx * speed, dy * speed]
     projectile.damage_component['damage'] = attacker.combat_component['damage']
+    print(f"TEAM: {projectile.team}")
 
 ATTACKS = {
     'single_shot': single_shot,

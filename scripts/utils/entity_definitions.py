@@ -10,7 +10,8 @@ ENEMY_DEFINITIONS = {
         },
         'health_component': {
             'max_health': 200,
-            'health': 200
+            'health': 200,
+            'last_hit': 0
         },
         'combat_component': {
             'type': 'single_shot',
@@ -21,7 +22,6 @@ ENEMY_DEFINITIONS = {
             'targets': [],
             'target_priority': 'first',
             'last_shot': 0,
-            'last_hit': 0
         },
         'movement_component': {
             'speed': 3,
@@ -55,7 +55,8 @@ TOWER_DEFINITIONS = {
         },
         'health_component': {
             'max_health': 200,
-            'health': 200
+            'health': 200,
+            'last_hit': 0
         },
         'combat_component': {
             'type': 'single_shot',
@@ -66,7 +67,6 @@ TOWER_DEFINITIONS = {
             'targets': [],
             'target_priority': 'first',
             'last_shot': 0,
-            'last_hit': 0
         },
         "collision_component":{
             'collider': 26,
@@ -93,7 +93,8 @@ TOWER_DEFINITIONS = {
         },
         'health_component': {
             'max_health': 200,
-            'health': 200
+            'health': 200,
+            'last_hit': 0
         },
         "rendering_component":{
             'image path': "purple_cube.png",
@@ -128,6 +129,7 @@ PROJECTILE_DEFINITIONS = {
 
         "collision_component":{
             'collider':20,
+            'kb_zone': 200,
             'is_colliding': False,
             'type': "projectile"
         },
@@ -135,6 +137,10 @@ PROJECTILE_DEFINITIONS = {
         "velocity_component": {
             'speed': 3,
             'velocity': [0, 0]
+        },
+
+        'knockback_component': {
+            'force': 200
         },
 
         "damage_component": {

@@ -130,13 +130,16 @@ class PathfindingSystem:
 
         try:
             goal_tile = movement['goal'].position
+            entity.movement_component["final_tile"]
         except: 
             return None
 
         if goal_tile is None:
+            entity.movement_component["final_tile"]
             return None
 
         goal_tile = (goal_tile[1] // c.TILE_SIZE, goal_tile[0] // c.TILE_SIZE)
+        entity.movement_component["final_tile"]
         # print(goal_tile)
         start_tile = (int(entity.position[1] // c.TILE_SIZE), int(entity.position[0] // c.TILE_SIZE))
 
@@ -212,18 +215,18 @@ class PathfindingSystem:
 
                 self.check_if_path_dirty(entity, grid)
 
-                if movement["path_dirty"]:
-                    movement["needs_path"] = True
-                    movement["path_dirty"] = False
-
                 goals = self.get_possible_goals(entity, structures, movement["prefered_targets"])
                 goal = self.get_new_goal(goals, entity)
+
+                if movement["path_dirty"]:
+                    movement["goal"] = goal 
+                    movement["final_tile"] = None
+                    movement["needs_path"] = True
+                    movement["path_dirty"] = False
 
                 if movement.get("goal") is None:
                     movement["goal"] = goal 
                     movement["final_tile"] = None
 
-
                 if movement["needs_path"]:
-
                     self.generate_path(entity, movement, grid)
