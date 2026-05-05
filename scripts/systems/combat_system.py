@@ -73,14 +73,20 @@ class CombatSystem:
             entity.combat_component['func'] = ATTACKS[attack_type]
             attack_func = entity.combat_component['func']
 
-            attack_func(entity, target, 
-                        self.manager.create_entity(
+            projectile = None
+
+            if entity.combat_component['needs_projectile']:
+                projectile = self.manager.create_entity(
                 PROJECTILE_DEFINITIONS['template'],
                 (entity.position[0], entity.position[1]),
                 [(0, 0)],
                 entity.team,
                 eid=None
-            ))
+            )
+            else:
+                projectile = self.apply_damage
+
+            attack_func(entity, target, projectile)
         
             entity.combat_component['last_shot'] = now
     
@@ -90,16 +96,13 @@ class CombatSystem:
             proj.position[0] += velocity[0]
             proj.position[1] += velocity[1]
     
-    def apply_damage(self, projectile, target):
+    def apply_damage(self, damage, target):
         now = pygame.time.get_ticks()
         if now - target.health_component['last_hit'] >= .5*1000: #Invincibility time; prevents entities from getting hit by same proj twice
 
-            target.health_component['health'] -= projectile.damage_component['damage']
+            target.health_component['health'] -= damage
 
             target.health_component['last_hit'] = now #reset incibility reference
-        
-        if target.health_component['health'] <= 0: #kill entity if its health is 0
-            target.alive = False
         
     def get_projectile_hits(self):
         for projectile in self.manager.projectiles.values():
@@ -112,14 +115,13 @@ class CombatSystem:
                     continue
                 
                 if circle_collision(projectile.position, projectile.collision_component['collider'], entity.position, entity.collision_component['collider']):
-                    print(projectile, entity, projectile.team, entity.team)
-                    #apply damage before killing the projectile so projectiles with pierce arent destroyed by dead entity
-                    self.apply_damage(projectile, entity)
 
                     if projectile.peirce_component['peirce'] != 0: #dont kill projectile if it can hit multiple entities
                         projectile.peirce_component['peirce'] -= 1
                     else:
                         projectile.alive = False
+                    
+                    self.apply_damage(projectile.damage_component['damage'], entity)
 
     def update(self, grid, entities):
             

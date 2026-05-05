@@ -15,6 +15,7 @@ ENEMY_DEFINITIONS = {
         },
         'combat_component': {
             'type': 'single_shot',
+            'needs_projectile': True,
             'func': None,
             'range': 4,
             'cooldown': 2,
@@ -59,7 +60,8 @@ TOWER_DEFINITIONS = {
             'last_hit': 0
         },
         'combat_component': {
-            'type': 'single_shot',
+            'type': 'area_of_effect',
+            'needs_projectile': False,
             'func': None,
             'range': 4,
             'cooldown': 2,

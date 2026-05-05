@@ -20,6 +20,13 @@ def single_shot(attacker, target, spawn_projectile):
     projectile.damage_component['damage'] = attacker.combat_component['damage']
     print(f"TEAM: {projectile.team}")
 
+def area_of_effect(attacker, target, conditional):
+    for entity in attacker.combat_component["targets"]:
+        if entity.need["type"] != "projectile":
+            print(f"TARGET HEALTH: {target.health_component['health']}")
+            entity.health_component['health'] -= attacker.combat_component['damage']
+
 ATTACKS = {
     'single_shot': single_shot,
+    'area_of_effect': area_of_effect
 }
