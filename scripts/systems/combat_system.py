@@ -9,7 +9,7 @@ class CombatSystem:
     def __init__(self, manager):
         self.manager = manager
 
-    def get_tiles_in_range(self, center_row, center_col, radius):
+    def get_tiles_in_range(self, center_row, center_col, radius): #Get tiles covered by range radius
         tiles = []
         radius_sq = radius * radius
 
@@ -28,7 +28,7 @@ class CombatSystem:
         print("entity tiles checked:", tiles)
         return tiles
     
-    def get_entities_in_range(self, grid, row, col, radius, entity):
+    def get_entities_in_range(self, grid, row, col, radius, entity): #Get entities from tiles covered by range radius
         tiles = self.get_tiles_in_range(row, col, radius)
         ids = []
 
@@ -47,7 +47,7 @@ class CombatSystem:
         print("TARGETS:", targets)
         return targets
 
-    def filter_by_exact_range(self, entity, targets, radius):
+    def filter_by_exact_range(self, entity, targets, radius): #Get entities in range radius
         result = []
 
         for target in targets:
@@ -67,42 +67,42 @@ class CombatSystem:
             if not entity.combat_component['targets']:
                 return
 
-            target = entity.combat_component['targets'][0]
-
+            #Get the attack type from the entity data
             attack_type = entity.combat_component['type']
             entity.combat_component['func'] = ATTACKS[attack_type]
             attack_func = entity.combat_component['func']
+            
+            #optional data for any attack to use
+            context = {
+                "target": entity.combat_component['targets'][0],
+                "targets": entity.combat_component['targets'],
+                "manager": self.manager,
+                "apply_damage": self.apply_damage,
+            }
 
-            projectile = None
-
-            if entity.combat_component['needs_projectile']:
-                projectile = self.manager.create_entity(
-                PROJECTILE_DEFINITIONS['template'],
-                (entity.position[0], entity.position[1]),
-                [(0, 0)],
-                entity.team,
-                eid=None
-            )
-            else:
-                projectile = self.apply_damage
-
-            attack_func(entity, target, projectile)
-        
+            #Call the associated attack function
+            attack_func(entity, context)
+            #Update the time for the most recent attack to now
             entity.combat_component['last_shot'] = now
     
     def move_projectiles(self):
         for eid, proj in self.manager.projectiles.items():
+
+            #Grab entity stored velocity and move the objects position with it
             velocity = proj.velocity_component['velocity']
+
             proj.position[0] += velocity[0]
             proj.position[1] += velocity[1]
     
     def apply_damage(self, damage, target):
+
         now = pygame.time.get_ticks()
+
         if now - target.health_component['last_hit'] >= .5*1000: #Invincibility time; prevents entities from getting hit by same proj twice
 
             target.health_component['health'] -= damage
 
-            target.health_component['last_hit'] = now #reset incibility reference
+            target.health_component['last_hit'] = now #Updates to ost recent time entity was damaged
         
     def get_projectile_hits(self):
         for projectile in self.manager.projectiles.values():
