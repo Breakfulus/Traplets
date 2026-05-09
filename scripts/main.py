@@ -38,37 +38,35 @@ mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['template'], (0 * c.TILE_SIZ
 mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['template'], (0 * c.TILE_SIZE + c.TILE_SIZE // 2, 2 * c.TILE_SIZE + c.TILE_SIZE // 2), [(2, 0)], 'enemy')
 
 base = manager.create_entity(TOWER_DEFINITIONS['base'], (4 * c.TILE_SIZE + c.TILE_SIZE // 2, 4 * c.TILE_SIZE + c.TILE_SIZE // 2), [(4, 4)], 'player')
+c.GAME_STATE = 0
 
 running = True
 while running:
-    
-    #Event loop
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_F11:
-                pygame.display.toggle_fullscreen()
-        
-            if event.key == pygame.K_c:
-                if c.MODE == 0: c.MODE = 1
-                else: c.MODE = 0
 
-        place_system.placement_system_events(event)
+    if c.GAME_STATE == 0: #Actively playing
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_F11:
+                    pygame.display.toggle_fullscreen()
+            place_system.placement_system_events(event)
         
-        if event.type == PLACETOWER:
-            manager.create_entity(event.blueprint, event.pos, event.tiles, event.team)
+            if event.type == PLACETOWER:
+                manager.create_entity(event.blueprint, event.pos, event.tiles, event.team)
 
-        if event.type == DESTROYTOWER:
-            manager.entities[event.eid].alive = False
-        
-        if event.type == SELECTTOWER:
-            print(f"Entity {event.eid} selected!")
-            manager.select_entity(event.eid)
+            if event.type == DESTROYTOWER:
+                if manager.entities[event.eid].structure_component["destructible"]:
+                    manager.entities[event.eid].alive = False
+                else:
+                    continue
+            
+            if event.type == SELECTTOWER:
+                print(f"Entity {event.eid} selected!")
+                manager.select_entity(event.eid)
 
-
-    if c.GAME_STATE == 0:
         mouse_pos = place_system.mouse_position()
         
         #Add selected tiles during building to selection
@@ -92,8 +90,19 @@ while running:
 
         #Delete all entities who have a false alive flag at the end of a frame
         manager.entity_clean_up()
-    else:
+    else: #Lose scenario screen
+
+        #event loop
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_F11:
+                    pygame.display.toggle_fullscreen()
+
         screen.fill('darkslateblue')
+        #TODO Add some way to reset the game after losing
 
     pygame.display.flip()
     clock.tick(60)

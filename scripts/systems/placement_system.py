@@ -57,6 +57,7 @@ class PlacementSystem:
     def destroy(self, row, col, tile):
         obj = self.grid.get_tile(tile[1], tile[0], c.STRUCTURES)
         if obj and obj != None:
+
             destroy_tower_event = pygame.event.Event(DESTROYTOWER, eid=obj[0])
             pygame.event.post(destroy_tower_event)
         
@@ -127,6 +128,11 @@ class PlacementSystem:
         self.draw_selection(surf)
 
     def placement_system_events(self, event):
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_c:
+                    if c.MODE == 0: c.MODE = 1
+                    else: c.MODE = 0
+
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.__getattribute__('button') == 1:
                 if c.MODE == 0: 

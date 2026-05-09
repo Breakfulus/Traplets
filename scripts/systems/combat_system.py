@@ -129,8 +129,13 @@ class CombatSystem:
             health = getattr(entity, "health_component", None)
 
             if health:
-                if health['health'] <= 0:
-                    entity.alive = False
+                if health['health'] != 0:
+                    continue
+                
+                if entity.need["type"] == "base":
+                    c.GAME_STATE = 1
+                    
+                entity.alive = False
 
     def update(self, grid, entities):
             self.kill_entities(entities)

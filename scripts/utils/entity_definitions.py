@@ -18,7 +18,7 @@ ENEMY_DEFINITIONS = {
             'func': None,
             'range': 4,
             'cooldown': 2,
-            'damage': 5,
+            'damage': 50,
             'targets': [],
             'target_priority': 'first',
             'last_shot': 0,
@@ -82,7 +82,8 @@ TOWER_DEFINITIONS = {
         "structure_component":{
             'footprint': [[1]],
             'selectable': True,
-            'selected': False
+            'selected': False,
+            'destructible': True
         }
     },
     'base': {
@@ -109,7 +110,8 @@ TOWER_DEFINITIONS = {
         "structure_component":{
             'footprint': [[1]],
             'selectable': True,
-            'selected': False
+            'selected': False,
+            'destructible': False
         }
     },
 }
