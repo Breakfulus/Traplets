@@ -41,8 +41,7 @@ base = manager.create_entity(TOWER_DEFINITIONS['base'], (4 * c.TILE_SIZE + c.TIL
 
 running = True
 while running:
-    mouse_pos = place_system.mouse_position()
-
+    
     #Event loop
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -67,29 +66,35 @@ while running:
         if event.type == SELECTTOWER:
             print(f"Entity {event.eid} selected!")
             manager.select_entity(event.eid)
-    
 
-    #Add selected tiles during building to selection
-    place_system.building_selection()
-    
-    #Make enemies move
-    pathfinding_system.update(manager.enemies, manager.entities, grid)
-    enemy_movement.update(manager.entities, grid)
-    combat_system.update(grid, list(manager.entities.values()))
-    
-    grid.update()
 
-    #---Draw section---
-    screen.fill('darkslateblue')
+    if c.GAME_STATE == 0:
+        mouse_pos = place_system.mouse_position()
+        
+        #Add selected tiles during building to selection
+        place_system.building_selection()
+        
+        #Make enemies move
+        pathfinding_system.update(manager.enemies, manager.entities, grid)
+        enemy_movement.update(manager.entities, grid)
+        combat_system.update(grid, list(manager.entities.values()))
+        
+        grid.update()
 
-    grid.draw_grid(screen)
+        #---Draw section---
+        screen.fill('darkslateblue')
 
-    manager.render_entities(screen)
+        grid.draw_grid(screen)
 
-    place_system.draw(screen)
+        manager.render_entities(screen)
 
-    #Delete all entities who have a false alive flag at the end of a frame
-    manager.entity_clean_up()
+        place_system.draw(screen)
+
+        #Delete all entities who have a false alive flag at the end of a frame
+        manager.entity_clean_up()
+    else:
+        screen.fill('darkslateblue')
+
     pygame.display.flip()
     clock.tick(60)
 

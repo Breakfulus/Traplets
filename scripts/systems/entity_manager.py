@@ -49,11 +49,7 @@ class EntityManager:
     
     def entity_clean_up(self):
         for eid, entity in self.entities.items():
-            health = getattr(entity, "health_component", None)
 
-            if health:
-                if health['health'] <= 0:
-                    entity.alive = False
             if not entity.alive:
 
                 #remove all of that entity from the grid

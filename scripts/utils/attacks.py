@@ -2,6 +2,12 @@ import pygame
 import math
 from utils.entity_definitions import *
 
+''' This is a helper file. All the different type of attacks live here and can be called from the ATTACKS dict.
+Provides context for the many different attack types without the need for nesting code and endless if chains.
+To add an attack put its capabilities into its own method, attacks can be litterally about any action. 
+If your attack needs context the generic context doesnt provide, simply add it to the generic context dict in the combat_system.py file.
+'''
+
 def single_shot(attacker, context):
     target = context["target"]
     manager = context["manager"]

@@ -123,7 +123,17 @@ class CombatSystem:
                     
                     self.apply_damage(projectile.damage_component['damage'], entity)
 
+    def kill_entities(self, entities):
+
+        for entity in entities:
+            health = getattr(entity, "health_component", None)
+
+            if health:
+                if health['health'] <= 0:
+                    entity.alive = False
+
     def update(self, grid, entities):
+            self.kill_entities(entities)
             
             self.move_projectiles()
 
