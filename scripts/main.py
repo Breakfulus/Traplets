@@ -101,8 +101,18 @@ while running:
                 if event.key == pygame.K_F11:
                     pygame.display.toggle_fullscreen()
 
+                if event.key == pygame.K_SPACE:
+                    for entity in manager.entities.values():
+                        entity.alive = False
+                    
+                mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['template'], (0 * c.TILE_SIZE + c.TILE_SIZE // 2, 0 * c.TILE_SIZE + c.TILE_SIZE // 2), [(0, 0)], 'enemy')
+                mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['template'], (0 * c.TILE_SIZE + c.TILE_SIZE // 2, 1 * c.TILE_SIZE + c.TILE_SIZE // 2), [(1, 0)], 'enemy')
+                mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['template'], (0 * c.TILE_SIZE + c.TILE_SIZE // 2, 2 * c.TILE_SIZE + c.TILE_SIZE // 2), [(2, 0)], 'enemy')
+
+                base = manager.create_entity(TOWER_DEFINITIONS['base'], (4 * c.TILE_SIZE + c.TILE_SIZE // 2, 4 * c.TILE_SIZE + c.TILE_SIZE // 2), [(4, 4)], 'player')
+                c.GAME_STATE = 0
+
         screen.fill('darkslateblue')
-        #TODO Add some way to reset the game after losing
 
     pygame.display.flip()
     clock.tick(60)
