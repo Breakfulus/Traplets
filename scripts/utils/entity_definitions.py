@@ -14,9 +14,9 @@ ENEMY_DEFINITIONS = {
             'last_hit': 0
         },
         'combat_component': {
-            'type': 'single_shot',
+            'type': 'melee',
             'func': None,
-            'range': 4,
+            'range': 1,
             'cooldown': 2,
             'damage': 50,
             'targets': [],

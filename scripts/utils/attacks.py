@@ -41,9 +41,16 @@ def area_of_effect(attacker, context):
 
         #Apply damage to all targets in range
         apply_damage(attacker.combat_component["damage"], entity)
+
+def melee(attacker, context):
+    apply_damage = context["apply_damage"]
+    target = context['target']
+
+    apply_damage(attacker.combat_component["damage"], target)
             
 
 ATTACKS = {
     'single_shot': single_shot,
     'area_of_effect': area_of_effect,
+    'melee': melee
 }
