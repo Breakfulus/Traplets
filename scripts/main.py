@@ -6,14 +6,15 @@ from systems.movement_system import MovementSystem
 from systems.pathfinding_system import PathfindingSystem
 from systems.combat_system import CombatSystem
 import utils.consts as c
+import utils.entity_spwanpoints as spawns
 from utils.entity_definitions import *
-
 
 pygame.init()
 
 PLACETOWER = pygame.USEREVENT + 1
 DESTROYTOWER = pygame.USEREVENT + 2
 SELECTTOWER = pygame.USEREVENT + 3
+SPAWNENEMY = pygame.USEREVENT + 4
 
 screen = pygame.display.set_mode((c.SCREEN_WIDTH + c.UI_PANEL, c.SCREEN_HEIGHT), pygame.SCALED | pygame.RESIZABLE | pygame.FULLSCREEN)
 pygame.display.set_caption("Traplet Tower Defense")
@@ -33,9 +34,10 @@ enemy_movement = MovementSystem()
 pathfinding_system = PathfindingSystem()
 pathfinding_system.update(manager.enemies, manager.entities, grid)
 
-mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['template'], (0 * c.TILE_SIZE + c.TILE_SIZE // 2, 0 * c.TILE_SIZE + c.TILE_SIZE // 2), [(0, 0)], 'enemy')
-mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['template'], (0 * c.TILE_SIZE + c.TILE_SIZE // 2, 1 * c.TILE_SIZE + c.TILE_SIZE // 2), [(1, 0)], 'enemy')
-mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['template'], (0 * c.TILE_SIZE + c.TILE_SIZE // 2, 2 * c.TILE_SIZE + c.TILE_SIZE // 2), [(2, 0)], 'enemy')
+
+c.SPAWN_POINTS = spawns.get_possible_spawn_points()
+spawn_enemy_event = pygame.event.Event(SPAWNENEMY, pos=spawns.get_next_spawn_point())
+pygame.time.set_timer(spawn_enemy_event, 1000)
 
 base = manager.create_entity(TOWER_DEFINITIONS['base'], (4 * c.TILE_SIZE + c.TILE_SIZE // 2, 4 * c.TILE_SIZE + c.TILE_SIZE // 2), [(4, 4)], 'player')
 c.GAME_STATE = 0
@@ -48,6 +50,11 @@ while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+
+            if event.type == SPAWNENEMY:
+                choice = spawns.get_next_spawn_point()
+                manager.create_entity(ENEMY_DEFINITIONS['template'], (choice[0] * c.TILE_SIZE + c.TILE_SIZE // 2, choice[1] * c.TILE_SIZE + c.TILE_SIZE // 2), [(choice[1], choice[0])], 'enemy')
+                pygame.time.set_timer(spawn_enemy_event, 1000*5)
             
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_F11:

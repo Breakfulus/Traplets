@@ -8,6 +8,7 @@ UI_PANEL = (GRID_WIDTH * TILE_SIZE) * .35
 GRAY = (15, 15, 15)
 
 MODE = 0
+SPAWN_POINTS = ()
 
 #strings
 STRUCTURES = "structures"
