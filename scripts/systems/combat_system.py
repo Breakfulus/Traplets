@@ -122,9 +122,18 @@ class CombatSystem:
                         projectile.alive = False
                     
                     self.apply_damage(projectile.damage_component['damage'], entity)
+    
+    def despawn_projectiles(self):
+        for projectile in self.manager.projectiles.values():
+            despawn = getattr(projectile, "despawn_component", None)
+
+            if despawn['time_alive'] != despawn['lifespan']:
+                despawn['time_alive'] += .001
+            
+            elif despawn['time_alive'] >= despawn['lifespan']:
+                projectile.alive = False
 
     def kill_entities(self, entities):
-
         for entity in entities:
             health = getattr(entity, "health_component", None)
 
@@ -143,6 +152,8 @@ class CombatSystem:
             self.move_projectiles()
 
             self.get_projectile_hits()
+
+            self.despawn_projectiles()
 
             for entity in entities:
                 combat = getattr(entity, "combat_component", None)

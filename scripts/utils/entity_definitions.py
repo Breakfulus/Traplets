@@ -151,6 +151,11 @@ PROJECTILE_DEFINITIONS = {
 
         "peirce_component":{
             'peirce': 0
+        },
+
+        "despawn_component":{
+            'lifespan': 1.0,
+            'time_alive': 0.0
         }
     },
 }
