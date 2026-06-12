@@ -2,11 +2,12 @@ import pygame
 import math
 from utils.entity_definitions import *
 
-''' This is a helper file. All the different type of attacks live here and can be called from the ATTACKS dict.
+""" This is a helper file. All the different type of attacks live here and can be called from the ATTACKS dict.
 Provides context for the many different attack types without the need for nesting code and endless if chains.
 To add an attack put its capabilities into its own method, attacks can be litterally about any action. 
 If your attack needs context the generic context doesnt provide, simply add it to the generic context dict in the combat_system.py file.
-'''
+"""
+
 
 def single_shot(attacker, context):
     target = context["target"]
@@ -14,43 +15,58 @@ def single_shot(attacker, context):
     dx = target.position[0] - attacker.position[0]
     dy = target.position[1] - attacker.position[1]
 
+    damage = attacker.combat_component["damage"]
+    is_crit = context["is_crit"]
+
+    if is_crit:
+        damage = damage * 2
+
     dist = math.hypot(dx, dy)
     if dist == 0:
         return
-    
+
     dx /= dist
     dy /= dist
 
     projectile = manager.create_entity(
-                PROJECTILE_DEFINITIONS['template'],
-                (attacker.position[0], attacker.position[1]),
-                [(0, 0)],
-                attacker.team,
-                eid=None
-            )
-    speed = projectile.velocity_component['speed']
+        PROJECTILE_DEFINITIONS["template"],
+        (attacker.position[0], attacker.position[1]),
+        [(0, 0)],
+        attacker.team,
+        eid=None,
+    )
+    speed = projectile.velocity_component["speed"]
 
     projectile.velocity_component["velocity"] = [dx * speed, dy * speed]
-    projectile.damage_component['damage'] = attacker.combat_component['damage'] #Give damage stat from attacker to projectile
+    projectile.damage_component["damage"] = (
+        damage  # Give damage stat from attacker to projectile
+    )
     print(f"TEAM: {projectile.team}")
+
 
 def area_of_effect(attacker, context):
     apply_damage = context["apply_damage"]
+    damage = attacker.combat_component["damage"]
+    is_crit = context["is_crit"]
+
+    if is_crit:
+        damage *= 2
 
     for entity in attacker.combat_component["targets"]:
+        # Apply damage to all targets in range
+        apply_damage(damage, entity)
 
-        #Apply damage to all targets in range
-        apply_damage(attacker.combat_component["damage"], entity)
 
 def melee(attacker, context):
     apply_damage = context["apply_damage"]
-    target = context['target']
+    target = context["target"]
+    damage = attacker.combat_component["damage"]
+    is_crit = context["is_crit"]
 
-    apply_damage(attacker.combat_component["damage"], target)
-            
+    if is_crit:
+        damage *= 2
+    apply_damage(damage, target)
 
-ATTACKS = {
-    'single_shot': single_shot,
-    'area_of_effect': area_of_effect,
-    'melee': melee
-}
+
+ATTACKS = {"single_shot": single_shot, "area_of_effect": area_of_effect, "melee": melee}
+
