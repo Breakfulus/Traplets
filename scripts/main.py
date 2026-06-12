@@ -8,6 +8,7 @@ from systems.combat_system import CombatSystem
 import utils.consts as c
 import utils.entity_spwanpoints as spawns
 from utils.entity_definitions import *
+import random
 
 pygame.init()
 
@@ -16,7 +17,10 @@ DESTROYTOWER = pygame.USEREVENT + 2
 SELECTTOWER = pygame.USEREVENT + 3
 SPAWNENEMY = pygame.USEREVENT + 4
 
-screen = pygame.display.set_mode((c.SCREEN_WIDTH + c.UI_PANEL, c.SCREEN_HEIGHT), pygame.SCALED | pygame.RESIZABLE | pygame.FULLSCREEN)
+screen = pygame.display.set_mode(
+    (c.SCREEN_WIDTH + c.UI_PANEL, c.SCREEN_HEIGHT),
+    pygame.SCALED | pygame.RESIZABLE | pygame.FULLSCREEN,
+)
 pygame.display.set_caption("Traplet Tower Defense")
 
 clock = pygame.time.Clock()
@@ -39,55 +43,68 @@ c.SPAWN_POINTS = spawns.get_possible_spawn_points()
 spawn_enemy_event = pygame.event.Event(SPAWNENEMY, pos=spawns.get_next_spawn_point())
 pygame.time.set_timer(spawn_enemy_event, 1000)
 
-base = manager.create_entity(TOWER_DEFINITIONS['base'], (4 * c.TILE_SIZE + c.TILE_SIZE // 2, 4 * c.TILE_SIZE + c.TILE_SIZE // 2), [(4, 4)], 'player')
+base = manager.create_entity(
+    TOWER_DEFINITIONS["base"],
+    (4 * c.TILE_SIZE + c.TILE_SIZE // 2, 4 * c.TILE_SIZE + c.TILE_SIZE // 2),
+    [(4, 4)],
+    "player",
+)
 c.GAME_STATE = 0
 
 running = True
 while running:
-
-    if c.GAME_STATE == 0: #Actively playing
-
+    if c.GAME_STATE == 0:  # Actively playing
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
             if event.type == SPAWNENEMY:
                 choice = spawns.get_next_spawn_point()
-                manager.create_entity(ENEMY_DEFINITIONS['template'], (choice[0] * c.TILE_SIZE + c.TILE_SIZE // 2, choice[1] * c.TILE_SIZE + c.TILE_SIZE // 2), [(choice[1], choice[0])], 'enemy')
-                pygame.time.set_timer(spawn_enemy_event, 1000*5)
-            
+                manager.create_entity(
+                    ENEMY_DEFINITIONS["template"],
+                    (
+                        choice[0] * c.TILE_SIZE + c.TILE_SIZE // 2,
+                        choice[1] * c.TILE_SIZE + c.TILE_SIZE // 2,
+                    ),
+                    [(choice[1], choice[0])],
+                    "enemy",
+                )
+                pygame.time.set_timer(spawn_enemy_event, 1000 * (random.randint(1, 5)))
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_F11:
                     pygame.display.toggle_fullscreen()
             place_system.placement_system_events(event)
-        
+
             if event.type == PLACETOWER:
-                manager.create_entity(event.blueprint, event.pos, event.tiles, event.team)
+                manager.create_entity(
+                    event.blueprint, event.pos, event.tiles, event.team
+                )
 
             if event.type == DESTROYTOWER:
                 if manager.entities[event.eid].structure_component["destructible"]:
                     manager.entities[event.eid].alive = False
                 else:
                     continue
-            
+
             if event.type == SELECTTOWER:
                 print(f"Entity {event.eid} selected!")
                 manager.select_entity(event.eid)
 
         mouse_pos = place_system.mouse_position()
-        
-        #Add selected tiles during building to selection
+
+        # Add selected tiles during building to selection
         place_system.building_selection()
-        
-        #Make enemies move
+
+        # Make enemies move
         pathfinding_system.update(manager.enemies, manager.entities, grid)
         enemy_movement.update(manager.entities, grid)
         combat_system.update(grid, list(manager.entities.values()))
-        
+
         grid.update()
 
-        #---Draw section---
-        screen.fill('darkslateblue')
+        # ---Draw section---
+        screen.fill("darkslateblue")
 
         grid.draw_grid(screen)
 
@@ -95,15 +112,14 @@ while running:
 
         place_system.draw(screen)
 
-        #Delete all entities who have a false alive flag at the end of a frame
+        # Delete all entities who have a false alive flag at the end of a frame
         manager.entity_clean_up()
-    else: #Lose scenario screen
-
-        #event loop
+    else:  # Lose scenario screen
+        # event loop
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_F11:
                     pygame.display.toggle_fullscreen()
@@ -112,18 +128,51 @@ while running:
                     for entity in manager.entities.values():
                         entity.alive = False
 
-                    manager.entity_clean_up() #clear up the entities before the loop resets
-                    
-                    mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['template'], (0 * c.TILE_SIZE + c.TILE_SIZE // 2, 0 * c.TILE_SIZE + c.TILE_SIZE // 2), [(0, 0)], 'enemy')
-                    mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['template'], (0 * c.TILE_SIZE + c.TILE_SIZE // 2, 1 * c.TILE_SIZE + c.TILE_SIZE // 2), [(1, 0)], 'enemy')
-                    mushant_1 = manager.create_entity(ENEMY_DEFINITIONS['template'], (0 * c.TILE_SIZE + c.TILE_SIZE // 2, 2 * c.TILE_SIZE + c.TILE_SIZE // 2), [(2, 0)], 'enemy')
+                    manager.entity_clean_up()  # clear up the entities before the loop resets
 
-                    base = manager.create_entity(TOWER_DEFINITIONS['base'], (4 * c.TILE_SIZE + c.TILE_SIZE // 2, 4 * c.TILE_SIZE + c.TILE_SIZE // 2), [(4, 4)], 'player')
+                    mushant_1 = manager.create_entity(
+                        ENEMY_DEFINITIONS["template"],
+                        (
+                            0 * c.TILE_SIZE + c.TILE_SIZE // 2,
+                            0 * c.TILE_SIZE + c.TILE_SIZE // 2,
+                        ),
+                        [(0, 0)],
+                        "enemy",
+                    )
+                    mushant_1 = manager.create_entity(
+                        ENEMY_DEFINITIONS["template"],
+                        (
+                            0 * c.TILE_SIZE + c.TILE_SIZE // 2,
+                            1 * c.TILE_SIZE + c.TILE_SIZE // 2,
+                        ),
+                        [(1, 0)],
+                        "enemy",
+                    )
+                    mushant_1 = manager.create_entity(
+                        ENEMY_DEFINITIONS["template"],
+                        (
+                            0 * c.TILE_SIZE + c.TILE_SIZE // 2,
+                            2 * c.TILE_SIZE + c.TILE_SIZE // 2,
+                        ),
+                        [(2, 0)],
+                        "enemy",
+                    )
+
+                    base = manager.create_entity(
+                        TOWER_DEFINITIONS["base"],
+                        (
+                            4 * c.TILE_SIZE + c.TILE_SIZE // 2,
+                            4 * c.TILE_SIZE + c.TILE_SIZE // 2,
+                        ),
+                        [(4, 4)],
+                        "player",
+                    )
                     c.GAME_STATE = 0
 
-        screen.fill('darkslateblue')
+        screen.fill("darkslateblue")
 
     pygame.display.flip()
     clock.tick(60)
 
 pygame.quit()
+
