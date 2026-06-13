@@ -81,7 +81,15 @@ class EntityManager:
                 rect.center = entity.position
                 screen.blit(entity_image, rect)
 
-        for entity in sorted_entities:
+                if hasattr(entity, "health_component"):
+                    now = pygame.time.get_ticks()
+                    if now - entity.health_component["last_hit"] < 50:
+                        target = entity_image.copy()
+                        target.fill(
+                            (255, 255, 255, 0), special_flags=pygame.BLEND_RGBA_MAX
+                        )
+                        screen.blit(target, rect)
+
             if hasattr(entity, "structure_component"):
                 if hasattr(entity, "combat_component"):
                     if entity.structure_component["selectable"]:
