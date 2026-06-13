@@ -114,6 +114,7 @@ while running:
 
         # Delete all entities who have a false alive flag at the end of a frame
         manager.entity_clean_up()
+
     else:  # Lose scenario screen
         # event loop
         for event in pygame.event.get():
@@ -129,44 +130,6 @@ while running:
                         entity.alive = False
 
                     manager.entity_clean_up()  # clear up the entities before the loop resets
-
-                    mushant_1 = manager.create_entity(
-                        ENEMY_DEFINITIONS["template"],
-                        (
-                            0 * c.TILE_SIZE + c.TILE_SIZE // 2,
-                            0 * c.TILE_SIZE + c.TILE_SIZE // 2,
-                        ),
-                        [(0, 0)],
-                        "enemy",
-                    )
-                    mushant_1 = manager.create_entity(
-                        ENEMY_DEFINITIONS["template"],
-                        (
-                            0 * c.TILE_SIZE + c.TILE_SIZE // 2,
-                            1 * c.TILE_SIZE + c.TILE_SIZE // 2,
-                        ),
-                        [(1, 0)],
-                        "enemy",
-                    )
-                    mushant_1 = manager.create_entity(
-                        ENEMY_DEFINITIONS["template"],
-                        (
-                            0 * c.TILE_SIZE + c.TILE_SIZE // 2,
-                            2 * c.TILE_SIZE + c.TILE_SIZE // 2,
-                        ),
-                        [(2, 0)],
-                        "enemy",
-                    )
-
-                    base = manager.create_entity(
-                        TOWER_DEFINITIONS["base"],
-                        (
-                            4 * c.TILE_SIZE + c.TILE_SIZE // 2,
-                            4 * c.TILE_SIZE + c.TILE_SIZE // 2,
-                        ),
-                        [(4, 4)],
-                        "player",
-                    )
                     c.GAME_STATE = 0
 
         screen.fill("darkslateblue")
@@ -175,4 +138,3 @@ while running:
     clock.tick(60)
 
 pygame.quit()
-
